@@ -90,6 +90,8 @@ A series of private 1-on-1 tutoring sessions in the style of Richard Feynman, co
 1. [Elliptic Curves](course-7-crypto-toolkit/lesson-1-elliptic-curves.md) — Point addition, scalar multiplication, ECDLP, BN254, implicit notation [x]_s
 2. [Bilinear Pairings](course-7-crypto-toolkit/lesson-2-bilinear-pairings.md) — The pairing map, bilinearity, Groth16 verification equation, one-shot limitation
 3. [SNARKs and Groth16](course-7-crypto-toolkit/lesson-3-snarks-groth16.md) — Complete Groth16 flow (Gen/Prove/Verify), knowledge soundness, extractors, role in BABE
+4. [Garbled Circuits](course-7-crypto-toolkit/lesson-4-garbled-circuits.md) — Wire labels, gate garbling, evaluation, free-XOR, half-gates, adaptive privacy
+5. [Witness Encryption](course-7-crypto-toolkit/lesson-5-witness-encryption.md) — Encrypt under NP statement, BABE's pairing-based WE, extractable security, the Lemma 10 fix, WE+GC=BABE
 ### Course 8: BABE — The Protocol and Its Security *(upcoming)*
 
 ## Key Takeaways Across All Courses
