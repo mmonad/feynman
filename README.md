@@ -84,7 +84,12 @@ A series of private 1-on-1 tutoring sessions in the style of Richard Feynman, co
 4. [Digital Signatures and Security Games](course-6-crypto-foundations/lesson-4-digital-signatures.md) — EUF-CMA, Lamport one-time signatures, the Lamport=GC coincidence, dot notation for oracles
 5. [Polynomials and Arithmetic Circuits](course-6-crypto-foundations/lesson-5-polynomials-arithmetic-circuits.md) — Schwartz-Zippel, R1CS, the polynomial bridge to Groth16, CRS and trusted setup
 
-### Course 7: The Cryptographic Toolkit *(upcoming)*
+### Course 7: The Cryptographic Toolkit
+*5 lessons — The algebraic machinery BABE is built from*
+
+1. [Elliptic Curves](course-7-crypto-toolkit/lesson-1-elliptic-curves.md) — Point addition, scalar multiplication, ECDLP, BN254, implicit notation [x]_s
+2. [Bilinear Pairings](course-7-crypto-toolkit/lesson-2-bilinear-pairings.md) — The pairing map, bilinearity, Groth16 verification equation, one-shot limitation
+3. [SNARKs and Groth16](course-7-crypto-toolkit/lesson-3-snarks-groth16.md) — Complete Groth16 flow (Gen/Prove/Verify), knowledge soundness, extractors, role in BABE
 ### Course 8: BABE — The Protocol and Its Security *(upcoming)*
 
 ## Key Takeaways Across All Courses
