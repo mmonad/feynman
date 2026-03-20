@@ -75,6 +75,18 @@ A series of private 1-on-1 tutoring sessions in the style of Richard Feynman, co
 5. [The Full Architecture](course-5-self-improving-harness/lesson-5-full-architecture.md) — Seven data flows, graceful degradation, build sequence, composition model co-evolution
 6. [The Bootstrap Paradox and the Economic Inflection](course-5-self-improving-harness/lesson-6-bootstrap-paradox.md) — Learning starvation, sawtooth improvement, proactive red-teaming, when student surpasses teacher, AGI as civilization
 
+### Course 6: Cryptography from First Principles
+*5 lessons — Math foundations through core crypto primitives (for understanding the BABE protocol)*
+
+1. [The Lock and Key Universe](course-6-crypto-foundations/lesson-1-lock-and-key-universe.md) — Security parameter, negligible functions, PPT adversaries, security games, why negligible must be exponential
+2. [Finite Fields and Modular Arithmetic](course-6-crypto-foundations/lesson-2-finite-fields.md) — Clock arithmetic, why primes give division, generators, discrete log problem
+3. [Hash Functions and the Random Oracle](course-6-crypto-foundations/lesson-3-hash-functions-random-oracle.md) — Hash properties, ROM, notation boot camp (sampling, probability, oracle access)
+4. [Digital Signatures and Security Games](course-6-crypto-foundations/lesson-4-digital-signatures.md) — EUF-CMA, Lamport one-time signatures, the Lamport=GC coincidence, dot notation for oracles
+5. [Polynomials and Arithmetic Circuits](course-6-crypto-foundations/lesson-5-polynomials-arithmetic-circuits.md) — Schwartz-Zippel, R1CS, the polynomial bridge to Groth16, CRS and trusted setup
+
+### Course 7: The Cryptographic Toolkit *(upcoming)*
+### Course 8: BABE — The Protocol and Its Security *(upcoming)*
+
 ## Key Takeaways Across All Courses
 
 1. An LLM's knowledge lives in its weights (stone) — permanent patterns carved during training
