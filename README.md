@@ -56,6 +56,15 @@ A series of private 1-on-1 tutoring sessions in the style of Richard Feynman, co
 4. [When Reviewers Disagree](course-3-orthogonal-adapters-code-review/lesson-4-when-reviewers-disagree.md) — Three categories of disagreement; confidence calibration; the disagreement matrix; composition model bias
 5. [Quis Custodiet Ipsos Custodes?](course-3-orthogonal-adapters-code-review/lesson-5-quis-custodiet-ipsos-custodes.md) — Third-order blind spots; defense in depth; the Kegan developmental parallel
 
+### Course 4: From Architecture to Enterprise
+*5 lessons — How do you build a defensible AI startup on the verification committee thesis?*
+
+1. [The Generalization: From Code Review to Universal Verification Committees](course-4-from-architecture-to-enterprise/lesson-1-the-generalization.md) — Domain suitability framework; scoring domains; why crypto is the best first vertical
+2. [The TAM: Mapping the Opportunity Space](course-4-from-architecture-to-enterprise/lesson-2-the-tam.md) — Bottom-up TAM, continuous monitoring market creation, wedge strategy, data flywheel, pricing paradox
+3. [Formal Verification of Cryptographic Protocols with Lean 4](course-4-from-architecture-to-enterprise/lesson-3-formal-verification-lean4.md) — The four levels of correctness; why LLMs fail at Level 4; orthogonal adapters for verification gaps; mutation of specs and proofs
+4. [The Moat Question: What Frontier Labs Can't Copy](course-4-from-architecture-to-enterprise/lesson-4-the-moat-question.md) — Five layers of moat; horizontal tax; reputation ratchet; winner-take-most dynamics
+5. [Building the Company: Architecture as Strategy](course-4-from-architecture-to-enterprise/lesson-5-building-the-company.md) — Architecture-to-strategy mapping; go-to-market; team; fundraising; 18-month roadmap; the deepest risk
+
 ## Key Takeaways Across All Courses
 
 1. An LLM's knowledge lives in its weights (stone) — permanent patterns carved during training
