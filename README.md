@@ -65,6 +65,16 @@ A series of private 1-on-1 tutoring sessions in the style of Richard Feynman, co
 4. [The Moat Question: What Frontier Labs Can't Copy](course-4-from-architecture-to-enterprise/lesson-4-the-moat-question.md) — Five layers of moat; horizontal tax; reputation ratchet; winner-take-most dynamics
 5. [Building the Company: Architecture as Strategy](course-4-from-architecture-to-enterprise/lesson-5-building-the-company.md) — Architecture-to-strategy mapping; go-to-market; team; fundraising; 18-month roadmap; the deepest risk
 
+### Course 5: The Self-Improving Harness
+*6 lessons — How do you build a system that bootstraps from cloud dependence to local autonomy?*
+
+1. [The Harness: Orchestrating Cloud and Local](course-5-self-improving-harness/lesson-1-the-harness.md) — Cascade routing, cost-quality curve, sending failures to the teacher
+2. [Distillation from First Principles](course-5-self-improving-harness/lesson-2-distillation.md) — Dark knowledge, soft targets, temperature; selective distillation into LoRA specialists; sequence-level distillation from cloud APIs
+3. [Distillation into LoRA: Merging Teacher Knowledge with Task Adaptation](course-5-self-improving-harness/lesson-3-distillation-into-lora.md) — Rank expansion for dual signals; four combination strategies; LR/epoch/sampling balance
+4. [Micro Fine-Tuning: Learning While Serving](course-5-self-improving-harness/lesson-4-micro-fine-tuning.md) — Quality filter, replay buffer, micro learning rate, EWC anchoring, validation gate, three firewalls against model collapse
+5. [The Full Architecture](course-5-self-improving-harness/lesson-5-full-architecture.md) — Seven data flows, graceful degradation, build sequence, composition model co-evolution
+6. [The Bootstrap Paradox and the Economic Inflection](course-5-self-improving-harness/lesson-6-bootstrap-paradox.md) — Learning starvation, sawtooth improvement, proactive red-teaming, when student surpasses teacher, AGI as civilization
+
 ## Key Takeaways Across All Courses
 
 1. An LLM's knowledge lives in its weights (stone) — permanent patterns carved during training
