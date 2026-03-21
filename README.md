@@ -92,7 +92,14 @@ A series of private 1-on-1 tutoring sessions in the style of Richard Feynman, co
 3. [SNARKs and Groth16](course-7-crypto-toolkit/lesson-3-snarks-groth16.md) — Complete Groth16 flow (Gen/Prove/Verify), knowledge soundness, extractors, role in BABE
 4. [Garbled Circuits](course-7-crypto-toolkit/lesson-4-garbled-circuits.md) — Wire labels, gate garbling, evaluation, free-XOR, half-gates, adaptive privacy
 5. [Witness Encryption](course-7-crypto-toolkit/lesson-5-witness-encryption.md) — Encrypt under NP statement, BABE's pairing-based WE, extractable security, the Lemma 10 fix, WE+GC=BABE
-### Course 8: BABE — The Protocol and Its Security *(upcoming)*
+### Course 8: BABE — The Protocol and Its Security
+*5 lessons — The complete protocol, its security proof, and the Lean mechanization*
+
+1. [Bitcoin as a Cryptographic Platform](course-8-babe-protocol/lesson-1-bitcoin-platform.md) — UTXO model, locking scripts, 6-transaction graph, unstoppable transactions
+2. [The BABE Construction](course-8-babe-protocol/lesson-2-babe-construction.md) — WE+GC split, randomized encodings, DRE, linearization by lifting, 1000x size reduction
+3. [The Security Proof](course-8-babe-protocol/lesson-3-security-proof.md) — Robustness, knowledge soundness, hybrid arguments, reduction chain, why four proof assistants
+4. [The Mechanization](course-8-babe-protocol/lesson-4-mechanization.md) — Four proof assistants, axiom boundaries, audit findings, trust surface, stopping criterion
+5. [The Full Circle](course-8-babe-protocol/lesson-5-full-circle.md) — Recursive verification, the complete map, biological parallels, "billions of years of pre-training followed by a lifetime of LoRAs"
 
 ## Key Takeaways Across All Courses
 
