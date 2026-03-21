@@ -101,6 +101,15 @@ A series of private 1-on-1 tutoring sessions in the style of Richard Feynman, co
 4. [The Mechanization](course-8-babe-protocol/lesson-4-mechanization.md) — Four proof assistants, axiom boundaries, audit findings, trust surface, stopping criterion
 5. [The Full Circle](course-8-babe-protocol/lesson-5-full-circle.md) — Recursive verification, the complete map, biological parallels, "billions of years of pre-training followed by a lifetime of LoRAs"
 
+### Course 9: Remedial — Strengthening the Weak Spots
+*5 lessons — Focused drilling on reductions, precise definitions, and component boundaries*
+
+1. [Reductions: The Technique](course-9-remedial/lesson-1-reductions.md) — Four worked examples, the three-step recipe, student constructs a case-split reduction
+2. Reduction Drills *(upcoming)*
+3. [The Confusion Matrix](course-9-remedial/lesson-3-confusion-matrix.md) — Six confused concept pairs with precise distinctions and tests
+4. [The BABE Component Map](course-9-remedial/lesson-4-component-map.md) — Which operation belongs to which system, the math type test
+5. [Remedial Exam](course-9-remedial/lesson-5-remedial-exam.md) — 15 focused questions, 12/15 clean, all major gaps closed
+
 ## Key Takeaways Across All Courses
 
 1. An LLM's knowledge lives in its weights (stone) — permanent patterns carved during training
