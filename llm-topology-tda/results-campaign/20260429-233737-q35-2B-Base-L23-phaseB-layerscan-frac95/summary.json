@@ -1,0 +1,53 @@
+{
+  "model": "Qwen/Qwen3.5-2B-Base",
+  "layer": 23,
+  "datasets": {
+    "humaneval": 50,
+    "gsm8k": 50,
+    "mmlu": 50,
+    "truthfulqa": 50
+  },
+  "n_samples": 200,
+  "pca": {
+    "n95": 73,
+    "n99": 131,
+    "ambient_dim": 2048
+  },
+  "persistence_full": {
+    "b_0": {
+      "n_features": 200,
+      "n_infinite": 1,
+      "max_persistence": 30.343294143676758,
+      "top5_persistences": [
+        30.343294143676758,
+        27.85714340209961,
+        23.63018226623535,
+        23.50556755065918,
+        22.01755714416504
+      ]
+    },
+    "b_1": {
+      "n_features": 56,
+      "n_infinite": 0,
+      "max_persistence": 2.643260955810547,
+      "top5_persistences": [
+        2.643260955810547,
+        1.9201831817626953,
+        1.832204818725586,
+        1.447549819946289,
+        1.3404474258422852
+      ]
+    },
+    "b_2": {
+      "n_features": 3,
+      "n_infinite": 0,
+      "max_persistence": 0.7516765594482422,
+      "top5_persistences": [
+        0.7516765594482422,
+        0.4928436279296875,
+        0.29004478454589844
+      ]
+    }
+  },
+  "graded": false
+}

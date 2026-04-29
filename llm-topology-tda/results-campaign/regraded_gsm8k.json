@@ -1,0 +1,46 @@
+[
+  {
+    "run": "20260429-230658-q35-4B-Base-L19-grad-phaseA-graded",
+    "path": "results-campaign/20260429-230658-q35-4B-Base-L19-grad-phaseA-graded/graded.json",
+    "n": 50,
+    "old_correct": 1,
+    "new_correct": 37,
+    "old_acc": 0.02,
+    "new_acc": 0.74,
+    "n_flips_to_correct": 37,
+    "n_flips_to_wrong": 1
+  },
+  {
+    "run": "20260429-230658-q35-9B-Base-L19-grad-phaseA-graded",
+    "path": "results-campaign/20260429-230658-q35-9B-Base-L19-grad-phaseA-graded/graded.json",
+    "n": 50,
+    "old_correct": 2,
+    "new_correct": 40,
+    "old_acc": 0.04,
+    "new_acc": 0.8,
+    "n_flips_to_correct": 38,
+    "n_flips_to_wrong": 0
+  },
+  {
+    "run": "20260429-232057-q35-2B-Base-L14-grad-phaseA-graded",
+    "path": "results-campaign/20260429-232057-q35-2B-Base-L14-grad-phaseA-graded/graded.json",
+    "n": 50,
+    "old_correct": 1,
+    "new_correct": 27,
+    "old_acc": 0.02,
+    "new_acc": 0.54,
+    "n_flips_to_correct": 27,
+    "n_flips_to_wrong": 1
+  },
+  {
+    "run": "20260429-233033-q35-0.8B-Base-L14-grad-phaseA-graded",
+    "path": "results-campaign/20260429-233033-q35-0.8B-Base-L14-grad-phaseA-graded/graded.json",
+    "n": 50,
+    "old_correct": 0,
+    "new_correct": 17,
+    "old_acc": 0.0,
+    "new_acc": 0.34,
+    "n_flips_to_correct": 17,
+    "n_flips_to_wrong": 0
+  }
+]
