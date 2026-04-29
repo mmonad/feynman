@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61.1.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-topology-tda"
+version = "0.1.0"
+description = "Topological data analysis pipeline for LLM hidden-state representations (Course 20, Lesson 5)"
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "torch==2.10.0",
+    "transformers>=4.57",
+    "accelerate>=1.0",
+    "datasets>=3.0",
+    "scikit-learn>=1.5",
+    "umap-learn>=0.5",
+    "ripser>=0.6",
+    "persim>=0.3",
+    "matplotlib>=3.8",
+    "tqdm>=4.66",
+    "numpy>=1.26",
+    "huggingface-hub>=0.24",
+]
+
+[tool.uv]
+# This project is a collection of scripts, not an installable package.
+# `package = false` tells uv to install the dependencies into the venv but
+# skip building/installing the project itself, which avoids setuptools
+# tripping over the flat-layout module discovery.
+package = false
+no-build-isolation-package = ["torch", "triton"]
+override-dependencies = [
+    "triton==3.6.0",
+]
+
+# ROCm 7.2.2 wheels from AMD's repo. Targets the Radeon AI PRO R9700
+# (gfx1201, RDNA4). Mirrors the layout used in ../sakana-trinity.
+[tool.uv.sources]
+torch = { url = "https://repo.radeon.com/rocm/manylinux/rocm-rel-7.2.2/torch-2.10.0%2Brocm7.2.2.lw.git40d237bf-cp313-cp313-linux_x86_64.whl" }
+triton = { url = "https://repo.radeon.com/rocm/manylinux/rocm-rel-7.2.2/triton-3.6.0%2Brocm7.2.2.git4ed88892-cp313-cp313-linux_x86_64.whl" }
+
+[tool.ruff]
+line-length = 99
+target-version = "py313"

@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# uv
+.python-version
+uv.lock
+
+# Experiment outputs
+results/
+results-*/
+*.npz
+graded.json
+
+# OS
+.DS_Store
