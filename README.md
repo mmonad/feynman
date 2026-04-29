@@ -203,6 +203,15 @@ A series of private 1-on-1 tutoring sessions in the style of Richard Feynman, co
 4. Serving *(upcoming)*
 5. The Full Pipeline *(upcoming)*
 
+### Course 20: Beyond the Bitter Lesson — A Mathematical Theory of Intelligence (Survey)
+*5 lessons — The math we'd need to escape brute-force scaling: manifolds, persistent homology, statistical mechanics, with a hands-on TDA finale*
+
+1. [Empirical Recipes vs Mathematical Laws](course-20-mathematical-theory-of-intelligence/lesson-1-empirical-vs-theoretical.md) — Kepler vs Newton; Chinchilla scaling laws as Kepler; Shannon's channel capacity theorem as the bar; what "abstraction" means operationally; Kolmogorov complexity as the formal candidate for the "bit of abstraction"
+2. [Manifolds — Where an LLM's Knowledge Actually Lives](course-20-mathematical-theory-of-intelligence/lesson-2-manifolds.md) — Intrinsic vs ambient dimension; manifolds as locally-Euclidean / globally-curved spaces; the Manifold Hypothesis; PCA vs nonlinear methods (UMAP); hallucinations as off-manifold drift; multi-component manifolds and sparse bridges
+3. [Holes, Voids & Persistent Homology](course-20-mathematical-theory-of-intelligence/lesson-3-persistent-homology.md) — Simplicial complexes; Vietoris-Rips construction; Betti numbers `b_0`, `b_1`, `b_2`; persistence diagrams as deformation-invariant fingerprints; the *conditional* nature of "voids = hallucinations"; sampling bias and the methodological pushback that motivates a theoretical foundation
+4. [Statistical Mechanics, Phase Transitions & Grokking](course-20-mathematical-theory-of-intelligence/lesson-4-statistical-mechanics-and-grokking.md) — Boltzmann distribution as softmax-with-temperature; energy = loss; spin-glass loss landscapes; phase transitions and order parameters; grokking as a phase transition; RG flow as abstraction; the implied research program through universality classes
+5. [Hands-On — Extracting the Topology of a Real LLM](course-20-mathematical-theory-of-intelligence/lesson-5-hands-on-tda.md) — Full Python pipeline for Qwen3.5: hidden-state extraction, PCA dimensionality test, UMAP visualization, Vietoris-Rips persistent homology, differential persistence; practical engineering Q&A on model size, layer choice, EOS handling, and prompt-vs-generation; recommended run order from 0.8B prototype to 9B headline plus cross-scale comparison
+
 ## Key Takeaways Across All Courses
 
 1. An LLM's knowledge lives in its weights (stone) — permanent patterns carved during training
