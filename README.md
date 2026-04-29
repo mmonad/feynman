@@ -194,6 +194,15 @@ A series of private 1-on-1 tutoring sessions in the style of Richard Feynman, co
 5. [Privacy and Generative Models](course-18-systems-robustness-frontier/lesson-5-privacy-and-generative-models.md) — (ε,δ)-differential privacy, DP-SGD, composition theorem, federated learning, GANs vs diffusion (stability, mode coverage, conditioning), why diffusion training is stable
 6. [RLHF, Alignment & the Frontier](course-18-systems-robustness-frontier/lesson-6-rlhf-alignment-and-frontier.md) — RLHF pipeline (SFT→reward model→PPO), DPO, Goodhart's law, mesa-optimization, Constitutional AI, CLIP, test-time compute, mechanistic interpretability, scaling laws, open questions
 
+### Course 19: LoRA Training in Practice
+*5 lessons — Hands-on adapter training, serving, and deployment*
+
+1. [The Toolchain](course-19-lora-practice/lesson-1-toolchain.md) — Qwen3.5, Unsloth, PEFT, vLLM multi-LoRA serving, 2026 best practices (rsLoRA, EVA, all-linear targeting)
+2. Training Your First Adapter *(upcoming)*
+3. Multi-Adapter Training *(upcoming)*
+4. Serving *(upcoming)*
+5. The Full Pipeline *(upcoming)*
+
 ## Key Takeaways Across All Courses
 
 1. An LLM's knowledge lives in its weights (stone) — permanent patterns carved during training
