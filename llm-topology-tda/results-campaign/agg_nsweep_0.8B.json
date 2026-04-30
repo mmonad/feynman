@@ -1,0 +1,65 @@
+[
+  {
+    "run": "20260429-233033-q35-0.8B-Base-L14-grad-phaseA-graded",
+    "n": 200,
+    "n95": 37,
+    "b0_max_persistence": 2.676006555557251,
+    "b1_max_persistence": 0.1719796061515808,
+    "b2_max_persistence": 0.07805371284484863,
+    "tag": "phaseA"
+  },
+  {
+    "run": "20260429-233917-q35-0.8B-Base-L14-phaseB-layerscan-frac60",
+    "n": 200,
+    "n95": 37,
+    "b0_max_persistence": 2.672292709350586,
+    "b1_max_persistence": 0.16929203271865845,
+    "b2_max_persistence": 0.07752436399459839,
+    "tag": "phaseB"
+  },
+  {
+    "run": "20260429-233813-q35-0.8B-Base-L14-phaseD-expanded",
+    "n": 350,
+    "n95": 45,
+    "b0_max_persistence": 2.4697184562683105,
+    "b1_max_persistence": 0.1738342046737671,
+    "b2_max_persistence": 0.04285609722137451,
+    "tag": "phaseD"
+  },
+  {
+    "run": "20260430-092458-859-q35-0.8B-Base-L14-phaseE-Nsweep-N100",
+    "n": 400,
+    "n95": 57,
+    "b0_max_persistence": 2.553457498550415,
+    "b1_max_persistence": 0.17967712879180908,
+    "b2_max_persistence": 0.06849169731140137,
+    "tag": "phaseE"
+  },
+  {
+    "run": "20260429-233422-q35-0.8B-Base-L14-phaseC-wide-N200",
+    "n": 764,
+    "n95": 57,
+    "b0_max_persistence": 2.5155909061431885,
+    "b1_max_persistence": 0.14532345533370972,
+    "b2_max_persistence": 0.07936471700668335,
+    "tag": "phaseC"
+  },
+  {
+    "run": "20260430-092129-538-q35-0.8B-Base-L14-phaseE-Nsweep-N400",
+    "n": 1364,
+    "n95": 75,
+    "b0_max_persistence": 2.4713008403778076,
+    "b1_max_persistence": 0.17485898733139038,
+    "b2_max_persistence": 0.0659283995628357,
+    "tag": "phaseE"
+  },
+  {
+    "run": "20260430-092129-538-q35-0.8B-Base-L14-phaseE-Nsweep-N800",
+    "n": 2564,
+    "n95": 86,
+    "b0_max_persistence": 2.4147567749023438,
+    "b1_max_persistence": 0.16534775495529175,
+    "b2_max_persistence": 0.09630095958709717,
+    "tag": "phaseE"
+  }
+]

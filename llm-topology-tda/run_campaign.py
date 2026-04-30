@@ -42,6 +42,22 @@ LAYER_FRACTION = 0.60
 # Layer scan: shallow / mid-shallow / mid / mid-late / late, as fractions
 LAYER_SCAN_FRACTIONS = [0.20, 0.40, 0.60, 0.80, 0.95]
 
+# Late-layer accordion test: do n95/persistence contract toward the output?
+# Phase B stops at 0.95; if a contraction exists it lives in the last 1-2 blocks.
+LATE_LAYER_FRACTIONS = [0.97, 1.00]   # 0.95 already covered by Phase B
+
+# Per-dataset sample counts for the N-sweep on 0.8B (Phase E). Total cloud
+# size = sum across datasets, capped by each dataset's available pool
+# (humaneval saturates at 164). Existing data points: Phase A = 50/ds (200
+# total), Phase C = 200/ds (764 total). New Phase E adds {100, 400, 800}/ds
+# to span ~13× total-N range and characterize the bias-vs-N curve.
+NSWEEP_PER_DATASET = [100, 400, 800]
+
+# Target per-dataset count for the bigger-N replacement Phase G (no-grade
+# headline numbers). 200/ds matches the existing Phase C 0.8B data point so
+# 0.8B can be reused; only 2B/4B/9B need new runs.
+BIGGER_N_PER_DATASET = 200
+
 # Default GPU pool. Override via --gpus.
 DEFAULT_GPUS = (1, 3)
 
@@ -138,6 +154,50 @@ def build_default_campaign() -> list[dict]:
         "grade":    False,
         "datasets": expanded_datasets,
     })
+
+    # Phase E: N-sweep on 0.8B canonical layer (no-grade). Characterises how
+    # n95 and persistence values asymptote with sample count. Combined with
+    # Phase A (50/ds = 200 total) and Phase C (200/ds = 764 total) for a 5-
+    # point sweep over total N ∈ [200, 2564].
+    for n_per_ds in NSWEEP_PER_DATASET:
+        plan.append({
+            "tag":      f"phaseE-Nsweep-N{n_per_ds:03d}",
+            "model":    "Qwen/Qwen3.5-0.8B-Base",
+            "layer":    canonical_layer("Qwen/Qwen3.5-0.8B-Base"),
+            "grade":    False,
+            "datasets": [(ds, n_per_ds) for ds, _ in base_datasets],
+        })
+
+    # Phase F: late-layer accordion test. Extends Phase B's scan to fractions
+    # [0.97, 1.00] across all 4 models. The full-network trajectory (last
+    # block) is where any output-driven manifold contraction would show up.
+    for m in models:
+        n_layers = MODEL_NUM_LAYERS[m]
+        for frac in LATE_LAYER_FRACTIONS:
+            layer = max(1, min(n_layers, round(frac * n_layers)))
+            plan.append({
+                "tag":      f"phaseF-late-frac{int(frac * 100):02d}",
+                "model":    m,
+                "layer":    layer,
+                "grade":    False,
+                "datasets": base_datasets,
+            })
+
+    # Phase G: bigger-N replacement of Phase A's headline cross-scale
+    # numbers. No-grade (the success/failure split is handled by Item 3
+    # matched-N subsampling on existing Phase A graded data). Per-dataset
+    # 200 → ~764 total samples. All 4 models are re-run because the
+    # existing 0.8B/2B/4B/9B Phase A data used the pre-fix loaders (MMLU
+    # not shuffled, TruthfulQA-MC1 always-A gold) — the prompts and
+    # therefore the hidden states differ from the post-fix protocol.
+    for m in models:
+        plan.append({
+            "tag":      f"phaseG-biggerN-N{BIGGER_N_PER_DATASET:03d}",
+            "model":    m,
+            "layer":    canonical_layer(m),
+            "grade":    False,
+            "datasets": [(ds, BIGGER_N_PER_DATASET) for ds, _ in base_datasets],
+        })
 
     return plan
 
@@ -279,7 +339,7 @@ def parse_args():
                    help="Where per-run dirs go (default: ./results-campaign)")
     p.add_argument("--dry-run", action="store_true",
                    help="Print the plan and exit without executing")
-    p.add_argument("--phase", choices=["A", "B", "C", "D", "all"],
+    p.add_argument("--phase", choices=["A", "B", "C", "D", "E", "F", "G", "all"],
                    default="all", help="Subset of phases to run")
     p.add_argument("--max-run-minutes", type=int, default=DEFAULT_MAX_RUN_MIN,
                    help="Wall-clock cap per run; SIGKILLs the process group "

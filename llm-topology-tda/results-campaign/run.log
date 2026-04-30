@@ -76,3 +76,12 @@
   cmd: uv run run_experiment.py --gpu 1 --model Qwen/Qwen3.5-0.8B-Base --layer 23 --output results-campaign/20260429-233951-q35-0.8B-Base-L23-phaseB-layerscan-frac95 --datasets humaneval:50 gsm8k:50 mmlu:50 truthfulqa:50
 [ok] 2026-04-29T23:40:02.173183 gpu=3 20260429-233926-q35-0.8B-Base-L19-phaseB-layerscan-frac80 elapsed=36s exit=0 timed_out=False
 [ok] 2026-04-29T23:40:26.227658 gpu=1 20260429-233951-q35-0.8B-Base-L23-phaseB-layerscan-frac95 elapsed=35s exit=0 timed_out=False
+[start] 2026-04-30T09:21:29.538875 gpu=1 20260430-092129-538-q35-0.8B-Base-L14-phaseE-Nsweep-N800
+  cmd: uv run run_experiment.py --gpu 1 --model Qwen/Qwen3.5-0.8B-Base --layer 14 --output results-campaign/20260430-092129-538-q35-0.8B-Base-L14-phaseE-Nsweep-N800 --datasets humaneval:800 gsm8k:800 mmlu:800 truthfulqa:800
+[start] 2026-04-30T09:21:29.539168 gpu=3 20260430-092129-538-q35-0.8B-Base-L14-phaseE-Nsweep-N400
+  cmd: uv run run_experiment.py --gpu 3 --model Qwen/Qwen3.5-0.8B-Base --layer 14 --output results-campaign/20260430-092129-538-q35-0.8B-Base-L14-phaseE-Nsweep-N400 --datasets humaneval:400 gsm8k:400 mmlu:400 truthfulqa:400
+[ok] 2026-04-30T09:24:58.850119 gpu=3 20260430-092129-538-q35-0.8B-Base-L14-phaseE-Nsweep-N400 elapsed=209s exit=0 timed_out=False
+[start] 2026-04-30T09:24:58.859642 gpu=3 20260430-092458-859-q35-0.8B-Base-L14-phaseE-Nsweep-N100
+  cmd: uv run run_experiment.py --gpu 3 --model Qwen/Qwen3.5-0.8B-Base --layer 14 --output results-campaign/20260430-092458-859-q35-0.8B-Base-L14-phaseE-Nsweep-N100 --datasets humaneval:100 gsm8k:100 mmlu:100 truthfulqa:100
+[ok] 2026-04-30T09:25:49.241762 gpu=3 20260430-092458-859-q35-0.8B-Base-L14-phaseE-Nsweep-N100 elapsed=50s exit=0 timed_out=False
+[ok] 2026-04-30T09:42:08.768007 gpu=1 20260430-092129-538-q35-0.8B-Base-L14-phaseE-Nsweep-N800 elapsed=1239s exit=0 timed_out=False
