@@ -1,5 +1,12 @@
 # Campaign Results — Topology of Intelligence across Qwen3.5 sizes
 
+> **⚠ Superseded in places.** Several headline findings here have been
+> revised in `CAMPAIGN_RESULTS_V2.md` (2026-04-30) after the followup
+> campaign — N-sweep, bootstrap CIs, matched-N differential persistence,
+> negative controls, late-layer accordion test, and dataset-loader
+> bug fixes. Read v2 first; this v1 doc is preserved for historical
+> context.
+
 **Date:** 2026-04-29
 **Hardware:** 2× AMD Radeon AI PRO R9700 (RDNA4, gfx1201), ROCm 7.2.2
 **Wall-clock:** 33.5 min for 26 runs in parallel
