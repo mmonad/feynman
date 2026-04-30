@@ -3,8 +3,9 @@
 **Date:** 2026-04-30
 **Hardware:** 2× AMD Radeon AI PRO R9700 (RDNA4, gfx1201), ROCm 7.2.2
 **Models:** Qwen3.5-{0.8B, 2B, 4B, 9B}-Base
-**Status:** Phase E (N-sweep) ✓ completed. Phase F (late-layer) +
-Phase G (bigger-N) IN FLIGHT — this document is updated as runs land.
+**Status:** All 8 followup items ✓ done (items 1, 2, 3, 4, 5, 6, 8, 9).
+Item 7 ("base vs Instruct comparison") was explicitly excluded from
+this followup at the user's request.
 
 The original v1 campaign (`CAMPAIGN_RESULTS.md`, 2026-04-29) ran 26
 configurations and produced 5 headline findings. This v2 report is the
@@ -21,8 +22,8 @@ two conflict; v1 is preserved for historical context.
 | "n95 = 37/55/74/91 captures 95% variance" (Phase A, N=200) | n95 climbs ~2× when N → 2564 — biased low at N=200 | Phase E N-sweep shows no asymptote even at N=2564 |
 | "b₁ slope 1.30 is steeper than any Qwen benchmark" | b₁ slope = 1.15 ± 0.13 (95% CI [+0.91, +1.37]) — *overlaps* AA-LCR slope | Bootstrap CIs (50 reps) on a 4-point fit |
 | "9B has succ > fail b₁ topology, the 4B → 9B sign-flip" | Holds for 9B (p < 1e-7) but not as a 4B-flip; 0.8B also flips to succ > fail under matched-N | Matched-N subsampling removes the cloud-size confound |
-| "TruthfulQA-MC1: 9B scored 78%" | Inflated by always-A gold bug; real number TBD post-fix | Inspection found gold = A for all 50 samples |
-| "n95 grows monotonically through depth, no accordion ≤95%" | (pending Phase F at fractions 0.97/1.00) | Phase F extends the scan |
+| "TruthfulQA-MC1: 9B scored 78%" | Inflated by always-A gold bug; loader fixed but Phase G is no-grade so no fresh accuracy column yet | Inspection found gold = A for all 50 samples |
+| "n95 grows monotonically through depth, no accordion ≤95%" | Accordion is **size-dependent**: only 9B contracts at the last block; 0.8B/2B/4B *expand* (b₁ explodes ~3-10×) | Phase F fractions {0.97, 1.00} |
 | (no negative control) | Real cloud has ~10× LESS Vietoris-Rips topology than iid Gaussian; gap-vs-Σ-matched-Gaussian flips sign with scale | New negative_control.py |
 | (no positional sanity check on cross-scale slopes) | b₀ slope +1.09 is rock-tight (CI [1.04, 1.10]) and matches AA-LCR exactly | Bootstrap |
 
@@ -39,11 +40,13 @@ Max persistence values are stable across the same range (b₀: 2.68 →
 2.42, b₁: 0.17 → 0.16, b₂: 0.08 → 0.10). See `INSPECTION_NSWEEP.md`.
 
 ### Item 2 — Bigger-N Phase A on all 4 models
-**Status: in flight (Phase G).** Phase G re-runs all 4 models at the
-canonical mid layer with N=200/dataset (~764 total) and post-fix
-loaders (MMLU shuffled, TruthfulQA-MC1 choices shuffled). Results
-will replace the v1 headline cross-scale numbers. **Will be updated
-when Phase G completes.**
+**Status: ✓ done.** Phase G re-ran all 4 models at the canonical
+mid layer with N=200/dataset (~764 total) and post-fix loaders (MMLU
+shuffled, TruthfulQA-MC1 choices shuffled). All 4 runs completed in
+~8 min combined. Replaces the v1 headline cross-scale numbers — see
+"Final headline numbers" below. Crucial finding: n95 jumps 1.8-2.8×
+under bigger N, confirming the Item 1 N-bias result; persistence
+values mostly stable (b₀/b₁ ±5-10%, b₂ +50-85% at 4B/9B).
 
 ### Item 3 — Matched-N differential persistence
 **Status: ✓ done.** Subsampled success/failure clouds to
@@ -54,33 +57,46 @@ fail under matched-N (p < 1e-6), 2B becomes non-significant, only the
 `INSPECTION_MATCHED_DIFF.md`.
 
 ### Item 4 — Late-layer accordion test
-**Status: in flight (Phase F).** 8 Phase F runs across 4 models × 2
-fractions {0.97, 1.00} added. **Will be updated when Phase F
-completes.** Preview from existing Phase B: only 9B shows any hint of
-contraction (n95 dips 91 → 90 between fractions 0.59 → 0.81).
+**Status: ✓ done.** 8 Phase F runs across 4 models × 2 fractions
+{0.97, 1.00} completed. Striking finding: **only 9B contracts at
+the very last block** (n95 113→107, b₀ 174→111, b₁ 17.9→9.4, b₂
+6.4→2.4). The smaller models (0.8B/2B/4B) instead EXPAND in b₀/b₁/
+b₂ at the last block — explosive growth, opposite direction. The
+"accordion" hypothesis from v1 is therefore size-dependent: it
+appears at 9B but not below. See `INSPECTION_ACCORDION.md`.
 
 ### Item 5 — Random-Gaussian negative control
-**Status: ✓ done.** Two controls per model: (a) iid unit Gaussian
-of matched (N, ambient_dim) — real cloud has ~10× LESS b₁
-persistence than iid noise, strongly confirming Manifold Hypothesis;
-(b) Σ-matched Gaussian preserves all pairwise correlations — the
-real-vs-Σ-matched gap *flips sign* with scale (smaller models live
-closer to a Gaussian, bigger models develop higher-order structure).
+**Status: ✓ done (re-run with Phase G N=764 data).** Two controls
+per model: (a) iid unit Gaussian of matched (N, ambient_dim); (b)
+Σ-matched Gaussian preserving all pairwise correlations. Headline
+findings: Manifold Hypothesis (n95 << iid) holds at all 4 sizes (real
+n95 is 6-29% of iid n95). Topology richness story is *size-dependent*:
+0.8B/2B/4B all have b₁ << iid (less rich than noise), but **9B alone
+has b₁ > iid** (4.08 vs 2.63) — its manifold is genuinely
+topologically richer than even random points in matched ambient
+space. Σ-matched comparison agrees: real > Σ-matched only at 9B.
 
 ### Item 6 — Bootstrap CIs on log-log slopes
-**Status: ✓ done.** 50 bootstrap reps × 4 models. b₀ slope settles
-tightly at +1.09 ± 0.02 (matching Qwen's AA-LCR exactly); b₁ slope
-+1.15 ± 0.13 (CI overlaps AA-LCR); b₂ slope +1.18 ± 0.43 (CI too wide
-to interpret without bigger N). The "b₁ steeper than all Qwen
-benchmarks" claim is no longer supportable. See
-`INSPECTION_BOOTSTRAP.md`.
+**Status: ✓ done (re-run with Phase G N=764 clouds, N=200 subsample
+per rep).** Final point/CI numbers: b₀ slope +1.07 (CI [+1.06, +1.11])
+matches Qwen's AA-LCR (+1.09) within tolerance; b₁ slope +1.16 (CI
+[+1.02, +1.36]) is now strictly above AA-LCR at the lower bound —
+*modestly* steeper than the steepest unsaturated Qwen benchmark, but
+not "by a wide margin" as v1 claimed; b₂ slope +1.14 (CI [+0.78,
++1.43]) is much tighter than v1's ±0.43 thanks to bigger N. n95 has
+a known bootstrap-vs-point gap because bootstrap operates at the
+biased-N=200 regime. See `INSPECTION_BOOTSTRAP.md`.
 
 ### Item 8 — MMLU random-sample fix + subject coloring
-**Status: loader fix ✓ done; subject UMAP pending Phase G.**
-`load_mmlu` now shuffles the "all" split with a fixed seed before
-slicing so the first N samples are subject-diverse rather than all
-from one subject. Subject UMAP will be produced once a Phase G run
-exists with the fixed loader.
+**Status: ✓ done.** `load_mmlu` now shuffles the "all" split with a
+fixed seed before slicing so the first N samples are subject-diverse
+rather than all from one subject. With Phase G's 200 MMLU samples
+spanning 54 unique subjects, `plot_mmlu_subjects.py` produces 4
+subject-coloured UMAPs (one per model size). The 9B at L19 shows a
+tight `moral_scenarios` cluster cleanly separated from the rest — the
+model has memorised that subject's fixed prompt format. STEM and
+humanities centroids are distinguishable in the bigger cluster but
+overlap substantially. See `agg_mmlu_subjects_*.png`.
 
 ### Item 9 — TruthfulQA-MC1 manual inspection
 **Status: ✓ done.** Discovered the underlying HF
