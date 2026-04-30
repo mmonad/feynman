@@ -137,6 +137,45 @@ Per-run artifacts (one directory per of 26 configurations):
 
 ---
 
+## Cross-reference: Qwen's official benchmark scaling
+
+The Qwen3.5 model cards (2B and 4B pages) publish a unified comparison spanning all four sizes — 22 language benchmarks plus a vision suite. Although their scores are for the **post-trained / Instruct** variants (with optional thinking mode) while our campaign tested the **base** models, the cross-scale *shape* of the curves is comparable. Full data is in `qwen_official_benchmarks.json`; here are highlights.
+
+### Power-law slopes (`d log(value) / d log(params)`) across the 4 sizes
+
+Topology (ours, base models, canonical mid layer):
+
+| Metric | Slope |
+|---|---:|
+| `n95` | **+0.38** |
+| `b₂` max persistence | **+0.96** |
+| `b₀` max persistence | **+1.09** |
+| `b₁` max persistence | **+1.30** |
+
+Qwen benchmarks, steepest-first:
+
+| Benchmark | Slope |
+|---|---:|
+| AA-LCR (long context) | +1.09 |
+| HMMT Nov 25 (reasoning) | +0.94 |
+| HMMT Feb 25 (reasoning) | +0.84 |
+| PolyMATH (multilingual math) | +0.82 |
+| TAU2-Bench (agent) | +0.80 |
+| ... | ... |
+| MMLU-Redux | +0.18 |
+| Global PIQA (commonsense) | +0.14 |
+| NOVA-63 (multilingual) | +0.12 |
+
+### Reading
+
+1. **Topology slopes (0.96-1.30) line up with the *hardest, least-saturated* Qwen benchmarks.** AA-LCR (long context), HMMT (math olympiad), PolyMATH all sit in the 0.8-1.1 slope range — same neighborhood as our `b₀` and `b₂`. The very *flat* benchmarks (NOVA-63, Global PIQA, MMLU-Redux) are ones where small models already do well so the curve has saturated.
+2. **`b₁` slope = 1.30 is steeper than any reported Qwen benchmark.** This may indicate `b₁` topology is still actively gaining headroom even at 9B, while behavioural capability metrics are starting to flatten.
+3. **Major caveat:** benchmark scores are capped at 100, so their slopes saturate as scores approach the ceiling. Topology values have no upper bound. Direct slope comparison structurally overstates topology's headroom relative to capped capability scores. A logistic-transformed comparison would be fairer (left for follow-up).
+
+The two new plots:
+- `agg_qwen_official_benchmarks.png` — full panel of Qwen's 22-benchmark scaling
+- `agg_qwen_benchmarks_vs_topology.png` — four representative benchmarks overlaid against our four topology metrics, all min-max normalised so curve *shapes* (not magnitudes) compare directly
+
 ## Caveats and follow-ups
 
 1. **N=200 phase-A persistence values are biased by sampling.** Phase C calibration suggests `b₀` slightly overestimated, `b₁`/`b₂` similar. Cross-scale *comparisons* are still valid (matched N) but absolute claims should use higher N.

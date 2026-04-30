@@ -1,0 +1,44 @@
+{
+  "_note": "Official Qwen3.5 benchmark scores extracted from the model cards at https://huggingface.co/Qwen/Qwen3.5-{0.8B,2B,4B} (the 9B numbers also appear on the 4B card). Thinking-mode scores where available, non-thinking otherwise. These are scores for the POST-TRAINED / Instruct variants; our campaign tested the BASE models, so a direct accuracy comparison is not apples-to-apples — but the cross-scale shape of the curve is.",
+  "_columns": ["Qwen3.5-0.8B", "Qwen3.5-2B", "Qwen3.5-4B", "Qwen3.5-9B"],
+  "_mode_notes": {
+    "0.8B": "thinking mode where reported, else non-thinking",
+    "2B":   "thinking mode where reported, else non-thinking",
+    "4B":   "thinking mode (only mode reported on the 4B card)",
+    "9B":   "thinking mode (only mode reported on the 4B card)"
+  },
+  "Knowledge_STEM": {
+    "MMLU-Pro":       [42.3, 66.5, 79.1, 82.5],
+    "MMLU-Redux":     [59.5, 79.6, 88.8, 91.1],
+    "C-Eval":         [50.5, 73.2, 85.1, 88.2],
+    "SuperGPQA":      [21.3, 37.5, 52.9, 58.2],
+    "GPQA":           [11.9, 51.6, 76.2, 81.7]
+  },
+  "Instruction_Following": {
+    "IFEval":         [44.0, 78.6, 89.8, 91.5],
+    "IFBench":        [21.0, 41.3, 59.2, 64.5],
+    "MultiChallenge": [18.9, 33.7, 49.0, 54.5]
+  },
+  "Long_Context": {
+    "AA-LCR":         [4.7,  25.6, 57.0, 63.0],
+    "LongBench_v2":   [26.1, 38.7, 50.0, 55.2]
+  },
+  "Reasoning": {
+    "HMMT_Feb_25":    [null, 22.9, 74.0, 83.2],
+    "HMMT_Nov_25":    [null, 19.6, 76.8, 82.9]
+  },
+  "Agent": {
+    "BFCL-V4":        [25.3, 43.6, 50.3, 66.1],
+    "TAU2-Bench":     [11.6, 48.8, 79.9, 79.1]
+  },
+  "Multilingualism": {
+    "MMMLU":          [44.3, 63.1, 76.1, 81.2],
+    "MMLU-ProX":      [34.6, 52.3, 71.5, 76.3],
+    "NOVA-63":        [42.4, 46.4, 54.3, 55.9],
+    "INCLUDE":        [40.6, 55.4, 71.0, 75.6],
+    "Global_PIQA":    [59.4, 69.3, 78.9, 83.2],
+    "PolyMATH":       [8.2,  26.1, 51.1, 57.3],
+    "WMT24pp":        [27.2, 45.8, 66.6, 72.6],
+    "MAXIFE":         [39.2, 60.6, 78.0, 83.4]
+  }
+}
