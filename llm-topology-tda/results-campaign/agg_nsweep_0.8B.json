@@ -45,6 +45,15 @@
     "tag": "phaseC"
   },
   {
+    "run": "20260430-095105-103-q35-0.8B-Base-L14-phaseG-biggerN-N200",
+    "n": 764,
+    "n95": 68,
+    "b0_max_persistence": 2.498014450073242,
+    "b1_max_persistence": 0.1613708734512329,
+    "b2_max_persistence": 0.08327871561050415,
+    "tag": "phaseG"
+  },
+  {
     "run": "20260430-092129-538-q35-0.8B-Base-L14-phaseE-Nsweep-N400",
     "n": 1364,
     "n95": 75,

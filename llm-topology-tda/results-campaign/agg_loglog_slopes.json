@@ -1,8 +1,8 @@
 {
-  "ours/n95": 0.377,
-  "ours/b0_max_persistence": 1.093,
-  "ours/b1_max_persistence": 1.299,
-  "ours/b2_max_persistence": 0.965,
+  "ours/n95": 0.557,
+  "ours/b0_max_persistence": 1.071,
+  "ours/b1_max_persistence": 1.251,
+  "ours/b2_max_persistence": 1.143,
   "qwen/Knowledge_STEM/MMLU-Pro": 0.277,
   "qwen/Knowledge_STEM/MMLU-Redux": 0.177,
   "qwen/Knowledge_STEM/C-Eval": 0.232,

@@ -44,8 +44,11 @@ def load_qwen_benchmarks() -> dict[str, dict[str, list]]:
 
 
 def load_our_topology() -> dict[str, list]:
-    """Returns metric -> [value@0.8B, 2B, 4B, 9B] from Phase A summaries."""
+    """Returns metric -> [value@0.8B, 2B, 4B, 9B]. Prefers Phase G
+    (bigger-N, post-loader-fix) over Phase A; falls back to Phase A
+    for any model not yet covered by Phase G."""
     by_model: dict[str, dict] = {}
+    # Phase A as fallback
     for line in (ROOT / "experiments.jsonl").read_text().splitlines():
         if not line.strip():
             continue
@@ -55,9 +58,22 @@ def load_our_topology() -> dict[str, list]:
             continue
         if not r.get("ok"):
             continue
-        if not (r["config"].get("tag") or "").startswith("phaseA"):
+        tag = r["config"].get("tag") or ""
+        if tag.startswith("phaseA"):
+            by_model[r["config"]["model"].split("/")[-1]] = r["summary"]
+    # Phase G overrides
+    for line in (ROOT / "experiments.jsonl").read_text().splitlines():
+        if not line.strip():
             continue
-        by_model[r["config"]["model"].split("/")[-1]] = r["summary"]
+        try:
+            r = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not r.get("ok"):
+            continue
+        tag = r["config"].get("tag") or ""
+        if tag.startswith("phaseG"):
+            by_model[r["config"]["model"].split("/")[-1]] = r["summary"]
 
     metrics = {
         "n95":            [],

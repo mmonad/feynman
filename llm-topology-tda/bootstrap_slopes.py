@@ -81,8 +81,20 @@ def _metrics(X: np.ndarray) -> dict[str, float]:
 
 
 def _find_phaseA_runs() -> dict[str, Path]:
+    """Prefer Phase G (bigger-N, post-loader-fix) over Phase A. Falls back
+    to Phase A for any model not yet covered by Phase G."""
     out: dict[str, Path] = {}
+    # Phase A as baseline
     for d in sorted(ROOT.glob("*-q35-*-grad-phaseA-graded")):
+        npzs = list(d.glob("hidden_states_layer*.npz"))
+        if not npzs:
+            continue
+        for key in PARAMS_B:
+            if f"q35-{key}-Base" in d.name:
+                out[key] = npzs[0]
+                break
+    # Phase G overrides where present
+    for d in sorted(ROOT.glob("*-q35-*-phaseG-biggerN-*")):
         npzs = list(d.glob("hidden_states_layer*.npz"))
         if not npzs:
             continue
@@ -106,6 +118,11 @@ def parse_args():
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--reps", type=int, default=100,
                    help="Bootstrap reps (default 100)")
+    p.add_argument("--n-bootstrap", type=int, default=200,
+                   help="Subsample size per bootstrap rep (default 200). "
+                        "Resampling at the full cloud size (>1000) makes "
+                        "ripser maxdim=2 prohibitively slow; subsampling "
+                        "to a smaller fixed N keeps each rep fast.")
     p.add_argument("--seed", type=int, default=42)
     return p.parse_args()
 
@@ -133,12 +150,14 @@ def main():
     # Bootstrap loop
     slopes: dict[str, list[float]] = {m: [] for m in metrics_keys}
     point_metrics: dict[str, dict[str, float]] = {}
-    print(f"\nBootstrapping {args.reps} reps × 4 models...")
+    n_boot = args.n_bootstrap
+    print(f"\nBootstrapping {args.reps} reps × 4 models, N={n_boot}/rep...")
     for rep in range(args.reps):
         boot_metrics: dict[str, dict[str, float]] = {}
         for k in sorted_keys:
             X = clouds[k]
-            idx = rng.integers(0, X.shape[0], size=X.shape[0])
+            sample_n = min(n_boot, X.shape[0])
+            idx = rng.integers(0, X.shape[0], size=sample_n)
             X_boot = X[idx]
             boot_metrics[k] = _metrics(X_boot)
 

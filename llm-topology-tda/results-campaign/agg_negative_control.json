@@ -2,121 +2,121 @@
   {
     "model": "0.8B",
     "cloud": "real",
-    "N": 200,
+    "N": 764,
     "d": 1024,
-    "n95": 37,
-    "b0_max_persistence": 2.6735901832580566,
-    "b1_max_persistence": 0.16146349906921387,
-    "b2_max_persistence": 0.08127570152282715
+    "n95": 68,
+    "b0_max_persistence": 2.4998621940612793,
+    "b1_max_persistence": 0.16286975145339966,
+    "b2_max_persistence": 0.08552193641662598
   },
   {
     "model": "0.8B",
     "cloud": "iid_gauss",
-    "N": 200,
+    "N": 764,
     "d": 1024,
-    "n95": 175,
-    "b0_max_persistence": 20.460737228393555,
-    "b1_max_persistence": 2.2229366302490234,
-    "b2_max_persistence": 1.3282108306884766
+    "n95": 528,
+    "b0_max_persistence": 13.683953285217285,
+    "b1_max_persistence": 1.5932579040527344,
+    "b2_max_persistence": 0.8840513229370117
   },
   {
     "model": "0.8B",
     "cloud": "matched_cov",
-    "N": 200,
+    "N": 764,
     "d": 1024,
-    "n95": 29,
-    "b0_max_persistence": 1.51023530960083,
-    "b1_max_persistence": 0.2380196452140808,
-    "b2_max_persistence": 0.08062076568603516
+    "n95": 59,
+    "b0_max_persistence": 1.9151554107666016,
+    "b1_max_persistence": 0.2279500961303711,
+    "b2_max_persistence": 0.09218400716781616
   },
   {
     "model": "2B",
     "cloud": "real",
-    "N": 200,
+    "N": 764,
     "d": 2048,
-    "n95": 55,
-    "b0_max_persistence": 8.450349807739258,
-    "b1_max_persistence": 0.726543664932251,
-    "b2_max_persistence": 0.12282991409301758
+    "n95": 119,
+    "b0_max_persistence": 7.5222954750061035,
+    "b1_max_persistence": 0.6559526920318604,
+    "b2_max_persistence": 0.1667463779449463
   },
   {
     "model": "2B",
     "cloud": "iid_gauss",
-    "N": 200,
+    "N": 764,
     "d": 2048,
-    "n95": 181,
-    "b0_max_persistence": 27.819557189941406,
-    "b1_max_persistence": 3.372333526611328,
-    "b2_max_persistence": 1.6137638092041016
+    "n95": 627,
+    "b0_max_persistence": 16.471940994262695,
+    "b1_max_persistence": 2.782721519470215,
+    "b2_max_persistence": 1.2294282913208008
   },
   {
     "model": "2B",
     "cloud": "matched_cov",
-    "N": 200,
+    "N": 764,
     "d": 2048,
-    "n95": 40,
-    "b0_max_persistence": 6.9983673095703125,
-    "b1_max_persistence": 1.408139705657959,
-    "b2_max_persistence": 0.2930326461791992
+    "n95": 99,
+    "b0_max_persistence": 4.112627029418945,
+    "b1_max_persistence": 0.5522415637969971,
+    "b2_max_persistence": 0.2451920509338379
   },
   {
     "model": "4B",
     "cloud": "real",
-    "N": 200,
+    "N": 764,
     "d": 2560,
-    "n95": 74,
-    "b0_max_persistence": 14.4089937210083,
-    "b1_max_persistence": 0.911933422088623,
-    "b2_max_persistence": 0.2760429382324219
+    "n95": 186,
+    "b0_max_persistence": 13.017260551452637,
+    "b1_max_persistence": 0.8989348411560059,
+    "b2_max_persistence": 0.5190026760101318
   },
   {
     "model": "4B",
     "cloud": "iid_gauss",
-    "N": 200,
+    "N": 764,
     "d": 2560,
-    "n95": 182,
-    "b0_max_persistence": 29.73988914489746,
-    "b1_max_persistence": 3.599588394165039,
-    "b2_max_persistence": 2.4262943267822266
+    "n95": 645,
+    "b0_max_persistence": 17.85742950439453,
+    "b1_max_persistence": 2.2461013793945312,
+    "b2_max_persistence": 1.365920066833496
   },
   {
     "model": "4B",
     "cloud": "matched_cov",
-    "N": 200,
+    "N": 764,
     "d": 2560,
-    "n95": 51,
-    "b0_max_persistence": 8.805448532104492,
-    "b1_max_persistence": 1.0818467140197754,
-    "b2_max_persistence": 0.49972105026245117
+    "n95": 141,
+    "b0_max_persistence": 6.871886253356934,
+    "b1_max_persistence": 1.0824675559997559,
+    "b2_max_persistence": 0.48372411727905273
   },
   {
     "model": "9B",
     "cloud": "real",
-    "N": 200,
+    "N": 764,
     "d": 4096,
-    "n95": 91,
-    "b0_max_persistence": 40.00920486450195,
-    "b1_max_persistence": 4.738378524780273,
-    "b2_max_persistence": 1.0241575241088867
+    "n95": 256,
+    "b0_max_persistence": 35.308902740478516,
+    "b1_max_persistence": 4.075713157653809,
+    "b2_max_persistence": 1.2522296905517578
   },
   {
     "model": "9B",
     "cloud": "iid_gauss",
-    "N": 200,
+    "N": 764,
     "d": 4096,
-    "n95": 184,
-    "b0_max_persistence": 35.201133728027344,
-    "b1_max_persistence": 5.246025085449219,
-    "b2_max_persistence": 1.8949737548828125
+    "n95": 672,
+    "b0_max_persistence": 21.24826431274414,
+    "b1_max_persistence": 2.62860107421875,
+    "b2_max_persistence": 1.4585514068603516
   },
   {
     "model": "9B",
     "cloud": "matched_cov",
-    "N": 200,
+    "N": 764,
     "d": 4096,
-    "n95": 61,
-    "b0_max_persistence": 31.292179107666016,
-    "b1_max_persistence": 2.605295181274414,
-    "b2_max_persistence": 1.079885482788086
+    "n95": 180,
+    "b0_max_persistence": 24.777809143066406,
+    "b1_max_persistence": 2.9213714599609375,
+    "b2_max_persistence": 1.6157951354980469
   }
 ]

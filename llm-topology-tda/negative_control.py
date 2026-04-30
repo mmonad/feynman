@@ -102,14 +102,21 @@ def _make_matched_cov(X: np.ndarray, rng: np.random.Generator) -> np.ndarray:
 
 
 def find_phaseA_runs() -> dict[str, Path]:
-    """Locate one Phase A graded npz per model. Falls back to phaseG biggerN
-    no-grade run if Phase A is missing for that model."""
+    """Prefer Phase G (bigger-N, post-loader-fix) over Phase A graded
+    when both are available."""
     out: dict[str, Path] = {}
     for d in sorted(ROOT.glob("*-q35-*-grad-phaseA-graded")):
         npzs = list(d.glob("hidden_states_layer*.npz"))
         if not npzs:
             continue
-        # Extract model key from dir name.
+        for key in ("0.8B", "2B", "4B", "9B"):
+            if f"q35-{key}-Base" in d.name:
+                out[key] = npzs[0]
+                break
+    for d in sorted(ROOT.glob("*-q35-*-phaseG-biggerN-*")):
+        npzs = list(d.glob("hidden_states_layer*.npz"))
+        if not npzs:
+            continue
         for key in ("0.8B", "2B", "4B", "9B"):
             if f"q35-{key}-Base" in d.name:
                 out[key] = npzs[0]
