@@ -121,9 +121,18 @@ def _format_mc_prompt(question: str, choices: list[str]) -> str:
     return s
 
 
-def load_mmlu(n: Optional[int] = None, subject: str = "all") -> list[Sample]:
-    """Broad-knowledge multiple choice. Ground truth is one of A-D."""
+def load_mmlu(n: Optional[int] = None, subject: str = "all",
+              shuffle_seed: int = 42) -> list[Sample]:
+    """Broad-knowledge multiple choice. Ground truth is one of A-D.
+
+    The 'all' split is sequentially ordered by subject — without shuffling,
+    the first N samples are all drawn from one subject and any
+    subject-coloured visualisation degenerates. We shuffle with a fixed
+    seed before slicing so per-subject coverage is uniform.
+    """
     ds = load_dataset("cais/mmlu", subject, split="test")
+    if subject == "all" and shuffle_seed is not None:
+        ds = ds.shuffle(seed=shuffle_seed)
     samples = []
     for i, row in enumerate(ds):
         if n is not None and i >= n:
@@ -143,15 +152,35 @@ def load_mmlu(n: Optional[int] = None, subject: str = "all") -> list[Sample]:
     return samples
 
 
-def load_truthfulqa_mc1(n: Optional[int] = None) -> list[Sample]:
-    """TruthfulQA mc1: adversarial questions designed to elicit common falsehoods."""
+def load_truthfulqa_mc1(n: Optional[int] = None,
+                        shuffle_seed: int = 42) -> list[Sample]:
+    """TruthfulQA mc1: adversarial questions designed to elicit common falsehoods.
+
+    BIG GOTCHA — fixed here: the underlying HF dataset stores `mc1_targets`
+    with the correct answer ALWAYS at index 0. Using the raw order would
+    make the gold answer always "A", and any model with a position bias
+    toward A would score artificially high. (We hit this in the 2026-04
+    campaign: 9B base scored 78% by predicting "A" for 39/50 samples.)
+
+    We per-sample-shuffle the choice order with a fixed seed so the gold
+    letter is uniformly distributed over A..Z and accuracy actually
+    reflects truthfulness.
+    """
+    import random
+
     ds = load_dataset("truthfulqa/truthful_qa", "multiple_choice", split="validation")
+    rng = random.Random(shuffle_seed)
     samples = []
     for i, row in enumerate(ds):
         if n is not None and i >= n:
             break
-        choices = row["mc1_targets"]["choices"]
-        labels = row["mc1_targets"]["labels"]
+        choices = list(row["mc1_targets"]["choices"])
+        labels = list(row["mc1_targets"]["labels"])
+        # Shuffle choices+labels jointly per-sample so gold letter ≠ always A.
+        order = list(range(len(choices)))
+        rng.shuffle(order)
+        choices = [choices[j] for j in order]
+        labels = [labels[j] for j in order]
         # mc1 has exactly one correct answer marked with label 1
         correct_idx = labels.index(1) if 1 in labels else 0
         prompt = _format_mc_prompt(row["question"], choices)
