@@ -1,0 +1,140 @@
+{
+  "Qwen3.5-9B-Base": {
+    "6": {
+      "n95": 22,
+      "b1_max_p": 0.42924749851226807,
+      "tag": "phaseB-layerscan-frac20"
+    },
+    "13": {
+      "n95": 63,
+      "b1_max_p": 1.1842360496520996,
+      "tag": "phaseB-layerscan-frac40"
+    },
+    "19": {
+      "n95": 91,
+      "b1_max_p": 4.3679046630859375,
+      "tag": "phaseB-layerscan-frac60"
+    },
+    "26": {
+      "n95": 90,
+      "b1_max_p": 9.183948516845703,
+      "tag": "phaseB-layerscan-frac80"
+    },
+    "30": {
+      "n95": 98,
+      "b1_max_p": 14.41489028930664,
+      "tag": "phaseB-layerscan-frac95"
+    },
+    "31": {
+      "n95": 113,
+      "b1_max_p": 17.914836883544922,
+      "tag": "phaseF-late-frac97"
+    },
+    "32": {
+      "n95": 107,
+      "b1_max_p": 9.436279296875,
+      "tag": "phaseF-late-frac100"
+    }
+  },
+  "Qwen3.5-4B-Base": {
+    "6": {
+      "n95": 19,
+      "b1_max_p": 0.24211394786834717,
+      "tag": "phaseB-layerscan-frac20"
+    },
+    "13": {
+      "n95": 56,
+      "b1_max_p": 0.437908411026001,
+      "tag": "phaseB-layerscan-frac40"
+    },
+    "19": {
+      "n95": 74,
+      "b1_max_p": 0.9047503471374512,
+      "tag": "phaseB-layerscan-frac60"
+    },
+    "26": {
+      "n95": 74,
+      "b1_max_p": 2.785612106323242,
+      "tag": "phaseB-layerscan-frac80"
+    },
+    "30": {
+      "n95": 86,
+      "b1_max_p": 3.306730270385742,
+      "tag": "phaseB-layerscan-frac95"
+    },
+    "31": {
+      "n95": 99,
+      "b1_max_p": 4.086529731750488,
+      "tag": "phaseF-late-frac97"
+    },
+    "32": {
+      "n95": 102,
+      "b1_max_p": 11.910972595214844,
+      "tag": "phaseF-late-frac100"
+    }
+  },
+  "Qwen3.5-2B-Base": {
+    "5": {
+      "n95": 15,
+      "b1_max_p": 0.19587278366088867,
+      "tag": "phaseB-layerscan-frac20"
+    },
+    "10": {
+      "n95": 25,
+      "b1_max_p": 0.4011605978012085,
+      "tag": "phaseB-layerscan-frac40"
+    },
+    "14": {
+      "n95": 55,
+      "b1_max_p": 0.6478588581085205,
+      "tag": "phaseB-layerscan-frac60"
+    },
+    "19": {
+      "n95": 61,
+      "b1_max_p": 1.4429082870483398,
+      "tag": "phaseB-layerscan-frac80"
+    },
+    "23": {
+      "n95": 86,
+      "b1_max_p": 2.598451614379883,
+      "tag": "phaseF-late-frac97"
+    },
+    "24": {
+      "n95": 85,
+      "b1_max_p": 9.634635925292969,
+      "tag": "phaseF-late-frac100"
+    }
+  },
+  "Qwen3.5-0.8B-Base": {
+    "5": {
+      "n95": 13,
+      "b1_max_p": 0.04904377460479736,
+      "tag": "phaseB-layerscan-frac20"
+    },
+    "10": {
+      "n95": 25,
+      "b1_max_p": 0.06311661005020142,
+      "tag": "phaseB-layerscan-frac40"
+    },
+    "14": {
+      "n95": 37,
+      "b1_max_p": 0.16929203271865845,
+      "tag": "phaseB-layerscan-frac60"
+    },
+    "19": {
+      "n95": 43,
+      "b1_max_p": 0.46477699279785156,
+      "tag": "phaseB-layerscan-frac80"
+    },
+    "23": {
+      "n95": 71,
+      "b1_max_p": 0.9565234184265137,
+      "tag": "phaseF-late-frac97"
+    },
+    "24": {
+      "n95": 75,
+      "b1_max_p": 10.06973648071289,
+      "tag": "phaseF-late-frac100"
+    }
+  }
+}

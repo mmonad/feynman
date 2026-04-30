@@ -66,30 +66,52 @@ def by_phase(records: list[dict], phase: str) -> list[dict]:
 
 
 def plot_n95_vs_layer_per_model(records: list[dict], out: Path):
-    rows = by_phase(records, "B")
+    """Combined Phase B (frac 0.20-0.95) + Phase F (frac 0.97, 1.00)
+    accordion plot. The Phase B+F union finally covers the full network
+    end-to-end so a contraction in the last 1-2 blocks (if any) is
+    visible. Layer index is mapped to fraction-of-depth on the secondary
+    x-axis so models with different layer counts can be compared.
+    """
+    rows = by_phase(records, "B") + by_phase(records, "F")
     if not rows:
         return
-    by_model: dict[str, list[tuple[int, int]]] = defaultdict(list)
+    by_model: dict[str, list[tuple[int, int, int]]] = defaultdict(list)
+    layer_counts: dict[str, int] = {}
     for r in rows:
         m = short_model(r["config"]["model"])
         s = r["summary"]
         if s is None:
             continue
-        by_model[m].append((r["config"]["layer"], s["pca"]["n95"]))
+        # Pull the model's total layers from the per-run config or derive
+        # from the layer index distribution. We expect 24 for 0.8B/2B,
+        # 32 for 4B/9B; record the largest layer index seen as a proxy.
+        layer = r["config"]["layer"]
+        layer_counts[m] = max(layer_counts.get(m, 0), layer)
+        by_model[m].append((layer, s["pca"]["n95"], r.get("config", {}).get("tag", "")))
     if not by_model:
         return
 
-    plt.figure(figsize=(8, 5))
+    plt.figure(figsize=(9, 5))
     for m in MODEL_ORDER:
         if m not in by_model:
             continue
-        pts = sorted(by_model[m])
+        # De-duplicate by layer (latest run wins via insertion order)
+        latest: dict[int, tuple[int, str]] = {}
+        for ly, n95, tag in by_model[m]:
+            latest[ly] = (n95, tag)
+        pts = sorted(latest.items())
         xs = [p[0] for p in pts]
-        ys = [p[1] for p in pts]
+        ys = [v[0] for _, v in pts]
         plt.plot(xs, ys, marker="o", label=m)
+        # Annotate Phase F points so the late-layer additions are visible
+        for x, (y, tag) in pts:
+            if "phaseF" in tag:
+                plt.scatter([x], [y], marker="*", s=120, zorder=10,
+                            edgecolors="black", facecolors="none")
     plt.xlabel("Layer index (1-indexed in HF hidden_states tuple)")
     plt.ylabel("n95 (# PCs to explain 95% variance)")
-    plt.title("Intrinsic dimension vs depth — accordion effect")
+    plt.title("Intrinsic dimension vs depth — accordion effect "
+              "(★ = Phase F late layer)")
     plt.legend()
     plt.grid(alpha=0.3)
     plt.tight_layout()
@@ -97,8 +119,24 @@ def plot_n95_vs_layer_per_model(records: list[dict], out: Path):
     plt.close()
 
 
+def _cross_scale_rows(records: list[dict]) -> list[dict]:
+    """Prefer Phase G (bigger-N, post-loader-fix) over Phase A for the
+    cross-scale headline numbers. Falls back to Phase A for any model
+    not present in Phase G yet."""
+    by_model: dict[str, dict] = {}
+    # Phase A first as fallback
+    for r in by_phase(records, "A"):
+        m = short_model(r["config"]["model"])
+        by_model[m] = r
+    # Phase G overrides
+    for r in by_phase(records, "G"):
+        m = short_model(r["config"]["model"])
+        by_model[m] = r
+    return list(by_model.values())
+
+
 def plot_n95_vs_model_size(records: list[dict], out: Path):
-    rows = by_phase(records, "A")
+    rows = _cross_scale_rows(records)
     if not rows:
         return
     pts = []
@@ -107,13 +145,15 @@ def plot_n95_vs_model_size(records: list[dict], out: Path):
         s = r["summary"]
         if s is None:
             continue
-        pts.append((MODEL_PARAMS_B[m], s["pca"]["n95"], s["pca"]["ambient_dim"], m))
+        pts.append((MODEL_PARAMS_B[m], s["pca"]["n95"], s["pca"]["ambient_dim"], m,
+                    r["config"].get("tag", "")))
     if not pts:
         return
     pts.sort()
     xs = [p[0] for p in pts]
     n95s = [p[1] for p in pts]
     ambs = [p[2] for p in pts]
+    using_G = any("phaseG" in p[4] for p in pts)
 
     fig, ax1 = plt.subplots(figsize=(8, 5))
     ax1.set_xscale("log")
@@ -125,14 +165,15 @@ def plot_n95_vs_model_size(records: list[dict], out: Path):
     ax2.plot(xs, ambs, "s--", label="ambient", color="tab:orange", alpha=0.6)
     ax2.set_ylabel("ambient dim (hidden_size)", color="tab:orange")
     ax2.tick_params(axis="y", labelcolor="tab:orange")
-    plt.title("Linear intrinsic dimension vs model scale (canonical mid layer)")
+    src = "Phase G (bigger-N, post-loader-fix)" if using_G else "Phase A (N=200)"
+    plt.title(f"Linear intrinsic dim vs model scale, canonical mid layer ({src})")
     fig.tight_layout()
     plt.savefig(out, dpi=120)
     plt.close()
 
 
 def plot_persistence_vs_model_size(records: list[dict], out: Path):
-    rows = by_phase(records, "A")
+    rows = _cross_scale_rows(records)
     if not rows:
         return
     by_dim: dict[int, list[tuple[float, float]]] = defaultdict(list)
