@@ -339,8 +339,10 @@ def parse_args():
                    help="Where per-run dirs go (default: ./results-campaign)")
     p.add_argument("--dry-run", action="store_true",
                    help="Print the plan and exit without executing")
-    p.add_argument("--phase", choices=["A", "B", "C", "D", "E", "F", "G", "all"],
-                   default="all", help="Subset of phases to run")
+    p.add_argument("--phase", default="all",
+                   help="Phase(s) to run: one of {A,B,C,D,E,F,G,all}, "
+                        "or a comma-separated list e.g. 'F,G' to run "
+                        "Phase F and Phase G in a single campaign.")
     p.add_argument("--max-run-minutes", type=int, default=DEFAULT_MAX_RUN_MIN,
                    help="Wall-clock cap per run; SIGKILLs the process group "
                         f"if exceeded (default: {DEFAULT_MAX_RUN_MIN})")
@@ -354,7 +356,12 @@ def main():
 
     plan = build_default_campaign()
     if args.phase != "all":
-        plan = [c for c in plan if (c.get("tag") or "").startswith(f"phase{args.phase}")]
+        wanted = {p.strip() for p in args.phase.split(",")}
+        plan = [c for c in plan
+                if any((c.get("tag") or "").startswith(f"phase{p}")
+                       for p in wanted)]
+        if not plan:
+            sys.exit(f"--phase {args.phase} matched no configs")
 
     # Schedule largest-first so big 9B jobs start early and run while small
     # jobs cycle through the other GPU.
