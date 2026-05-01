@@ -125,3 +125,19 @@
   cmd: uv run run_experiment.py --gpu 1 --model Qwen/Qwen3.5-0.8B-Base --layer 24 --output results-campaign/20260430-095245-021-q35-0.8B-Base-L24-phaseF-late-frac100 --datasets humaneval:50 gsm8k:50 mmlu:50 truthfulqa:50
 [ok] 2026-04-30T09:52:58.340191 gpu=3 20260430-095224-978-q35-0.8B-Base-L23-phaseF-late-frac97 elapsed=33s exit=0 timed_out=False
 [ok] 2026-04-30T09:53:18.773372 gpu=1 20260430-095245-021-q35-0.8B-Base-L24-phaseF-late-frac100 elapsed=34s exit=0 timed_out=False
+[start] 2026-04-30T17:45:51.189129 gpu=1 20260430-174551-188-q35-9B-Base-L19-grad-phaseH-proper-grading-N200
+  cmd: uv run run_experiment.py --gpu 1 --model Qwen/Qwen3.5-9B-Base --layer 19 --output results-campaign/20260430-174551-188-q35-9B-Base-L19-grad-phaseH-proper-grading-N200 --datasets humaneval:200 mbpp:200 gsm8k:200 mmlu:200 truthfulqa:200 arc_challenge:200 boolq:200 --grade --max-new-tokens 512
+[start] 2026-04-30T17:45:51.189438 gpu=3 20260430-174551-188-q35-4B-Base-L19-grad-phaseH-proper-grading-N200
+  cmd: uv run run_experiment.py --gpu 3 --model Qwen/Qwen3.5-4B-Base --layer 19 --output results-campaign/20260430-174551-188-q35-4B-Base-L19-grad-phaseH-proper-grading-N200 --datasets humaneval:200 mbpp:200 gsm8k:200 mmlu:200 truthfulqa:200 arc_challenge:200 boolq:200 --grade --max-new-tokens 512
+[start] 2026-04-30T19:13:36.163764 gpu=1 20260430-191336-163-q35-9B-Base-L19-grad-phaseH-proper-grading-N200
+  cmd: uv run run_experiment.py --gpu 1 --model Qwen/Qwen3.5-9B-Base --layer 19 --output results-campaign/20260430-191336-163-q35-9B-Base-L19-grad-phaseH-proper-grading-N200 --datasets humaneval:200 mbpp:200 gsm8k:200 mmlu:200 truthfulqa:200 arc_challenge:200 boolq:200 --grade --max-new-tokens 512 --batch-size 8
+[start] 2026-04-30T19:13:36.163844 gpu=3 20260430-191336-163-q35-4B-Base-L19-grad-phaseH-proper-grading-N200
+  cmd: uv run run_experiment.py --gpu 3 --model Qwen/Qwen3.5-4B-Base --layer 19 --output results-campaign/20260430-191336-163-q35-4B-Base-L19-grad-phaseH-proper-grading-N200 --datasets humaneval:200 mbpp:200 gsm8k:200 mmlu:200 truthfulqa:200 arc_challenge:200 boolq:200 --grade --max-new-tokens 512 --batch-size 16
+[ok] 2026-04-30T19:57:13.802251 gpu=3 20260430-191336-163-q35-4B-Base-L19-grad-phaseH-proper-grading-N200 elapsed=2618s exit=0 timed_out=False
+[start] 2026-04-30T19:57:13.811519 gpu=3 20260430-195713-811-q35-2B-Base-L14-grad-phaseH-proper-grading-N200
+  cmd: uv run run_experiment.py --gpu 3 --model Qwen/Qwen3.5-2B-Base --layer 14 --output results-campaign/20260430-195713-811-q35-2B-Base-L14-grad-phaseH-proper-grading-N200 --datasets humaneval:200 mbpp:200 gsm8k:200 mmlu:200 truthfulqa:200 arc_challenge:200 boolq:200 --grade --max-new-tokens 512 --batch-size 16
+[ok] 2026-04-30T20:14:31.691048 gpu=1 20260430-191336-163-q35-9B-Base-L19-grad-phaseH-proper-grading-N200 elapsed=3656s exit=0 timed_out=False
+[start] 2026-04-30T20:14:31.700068 gpu=1 20260430-201431-699-q35-0.8B-Base-L14-grad-phaseH-proper-grading-N200
+  cmd: uv run run_experiment.py --gpu 1 --model Qwen/Qwen3.5-0.8B-Base --layer 14 --output results-campaign/20260430-201431-699-q35-0.8B-Base-L14-grad-phaseH-proper-grading-N200 --datasets humaneval:200 mbpp:200 gsm8k:200 mmlu:200 truthfulqa:200 arc_challenge:200 boolq:200 --grade --max-new-tokens 512 --batch-size 16
+[ok] 2026-04-30T20:22:54.093252 gpu=3 20260430-195713-811-q35-2B-Base-L14-grad-phaseH-proper-grading-N200 elapsed=1540s exit=0 timed_out=False
+[ok] 2026-04-30T20:33:52.588231 gpu=1 20260430-201431-699-q35-0.8B-Base-L14-grad-phaseH-proper-grading-N200 elapsed=1161s exit=0 timed_out=False

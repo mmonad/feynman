@@ -1,0 +1,898 @@
+{
+  "phase_source": {
+    "Qwen3.5-0.8B-Base": "phaseH",
+    "Qwen3.5-2B-Base": "phaseH",
+    "Qwen3.5-4B-Base": "phaseH",
+    "Qwen3.5-9B-Base": "phaseH"
+  },
+  "all": {
+    "label": "ALL DATASETS (Phase H \u2014 clean)",
+    "n_prompts": 1364,
+    "fail_rates": {
+      "Qwen3.5-0.8B-Base": 0.5894,
+      "Qwen3.5-2B-Base": 0.5103,
+      "Qwen3.5-4B-Base": 0.415,
+      "Qwen3.5-9B-Base": 0.3475
+    },
+    "pairwise": [
+      {
+        "i": "Qwen3.5-0.8B-Base",
+        "j": "Qwen3.5-2B-Base",
+        "co_fail": 0.4531,
+        "indep_baseline": 0.3008,
+        "lift": 1.506,
+        "phi": 0.619
+      },
+      {
+        "i": "Qwen3.5-0.8B-Base",
+        "j": "Qwen3.5-4B-Base",
+        "co_fail": 0.3673,
+        "indep_baseline": 0.2446,
+        "lift": 1.502,
+        "phi": 0.506
+      },
+      {
+        "i": "Qwen3.5-0.8B-Base",
+        "j": "Qwen3.5-9B-Base",
+        "co_fail": 0.3116,
+        "indep_baseline": 0.2048,
+        "lift": 1.521,
+        "phi": 0.456
+      },
+      {
+        "i": "Qwen3.5-2B-Base",
+        "j": "Qwen3.5-4B-Base",
+        "co_fail": 0.368,
+        "indep_baseline": 0.2117,
+        "lift": 1.738,
+        "phi": 0.635
+      },
+      {
+        "i": "Qwen3.5-2B-Base",
+        "j": "Qwen3.5-9B-Base",
+        "co_fail": 0.3094,
+        "indep_baseline": 0.1773,
+        "lift": 1.745,
+        "phi": 0.555
+      },
+      {
+        "i": "Qwen3.5-4B-Base",
+        "j": "Qwen3.5-9B-Base",
+        "co_fail": 0.3138,
+        "indep_baseline": 0.1442,
+        "lift": 2.176,
+        "phi": 0.723
+      }
+    ],
+    "pattern": {
+      "pattern_dist": {
+        "0000": 0.3262,
+        "0001": 0.0051,
+        "0010": 0.011,
+        "0011": 0.011,
+        "0100": 0.0271,
+        "0101": 0.0044,
+        "0110": 0.0103,
+        "0111": 0.0154,
+        "1000": 0.1063,
+        "1001": 0.0051,
+        "1010": 0.0081,
+        "1011": 0.0169,
+        "1100": 0.0916,
+        "1101": 0.0191,
+        "1110": 0.0718,
+        "1111": 0.2705
+      },
+      "pattern_counts": {
+        "0000": 445,
+        "0001": 7,
+        "0010": 15,
+        "0011": 15,
+        "0100": 37,
+        "0101": 6,
+        "0110": 14,
+        "0111": 21,
+        "1000": 145,
+        "1001": 7,
+        "1010": 11,
+        "1011": 23,
+        "1100": 125,
+        "1101": 26,
+        "1110": 98,
+        "1111": 369
+      },
+      "monotone_patterns": [
+        "0000",
+        "1000",
+        "1100",
+        "1110",
+        "1111"
+      ],
+      "monotone_mass": 0.8664,
+      "nonmonotone_mass": 0.1336,
+      "emergent_1110_count": 98,
+      "frontier_1111_count": 369,
+      "trivial_0000_count": 445
+    },
+    "kl_to_independence": 0.7594
+  },
+  "per_dataset": {
+    "arc_challenge": {
+      "label": "DOMAIN: arc_challenge",
+      "n_prompts": 200,
+      "fail_rates": {
+        "Qwen3.5-0.8B-Base": 0.315,
+        "Qwen3.5-2B-Base": 0.185,
+        "Qwen3.5-4B-Base": 0.08,
+        "Qwen3.5-9B-Base": 0.06
+      },
+      "pairwise": [
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-2B-Base",
+          "co_fail": 0.14,
+          "indep_baseline": 0.0583,
+          "lift": 2.402,
+          "phi": 0.453
+        },
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-4B-Base",
+          "co_fail": 0.05,
+          "indep_baseline": 0.0252,
+          "lift": 1.984,
+          "phi": 0.197
+        },
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.035,
+          "indep_baseline": 0.0189,
+          "lift": 1.852,
+          "phi": 0.146
+        },
+        {
+          "i": "Qwen3.5-2B-Base",
+          "j": "Qwen3.5-4B-Base",
+          "co_fail": 0.05,
+          "indep_baseline": 0.0148,
+          "lift": 3.378,
+          "phi": 0.334
+        },
+        {
+          "i": "Qwen3.5-2B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.035,
+          "indep_baseline": 0.0111,
+          "lift": 3.153,
+          "phi": 0.259
+        },
+        {
+          "i": "Qwen3.5-4B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.045,
+          "indep_baseline": 0.0048,
+          "lift": 9.375,
+          "phi": 0.624
+        }
+      ],
+      "pattern": {
+        "pattern_dist": {
+          "0000": 0.61,
+          "0001": 0.005,
+          "0010": 0.015,
+          "0011": 0.01,
+          "0100": 0.035,
+          "0101": 0.005,
+          "0110": 0.0,
+          "0111": 0.005,
+          "1000": 0.165,
+          "1001": 0.005,
+          "1010": 0.0,
+          "1011": 0.005,
+          "1100": 0.095,
+          "1101": 0.0,
+          "1110": 0.02,
+          "1111": 0.025
+        },
+        "pattern_counts": {
+          "0000": 122,
+          "0001": 1,
+          "0010": 3,
+          "0011": 2,
+          "0100": 7,
+          "0101": 1,
+          "0110": 0,
+          "0111": 1,
+          "1000": 33,
+          "1001": 1,
+          "1010": 0,
+          "1011": 1,
+          "1100": 19,
+          "1101": 0,
+          "1110": 4,
+          "1111": 5
+        },
+        "monotone_patterns": [
+          "0000",
+          "1000",
+          "1100",
+          "1110",
+          "1111"
+        ],
+        "monotone_mass": 0.915,
+        "nonmonotone_mass": 0.085,
+        "emergent_1110_count": 4,
+        "frontier_1111_count": 5,
+        "trivial_0000_count": 122
+      },
+      "kl_to_independence": 0.2559
+    },
+    "boolq": {
+      "label": "DOMAIN: boolq",
+      "n_prompts": 200,
+      "fail_rates": {
+        "Qwen3.5-0.8B-Base": 0.255,
+        "Qwen3.5-2B-Base": 0.145,
+        "Qwen3.5-4B-Base": 0.115,
+        "Qwen3.5-9B-Base": 0.085
+      },
+      "pairwise": [
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-2B-Base",
+          "co_fail": 0.085,
+          "indep_baseline": 0.037,
+          "lift": 2.299,
+          "phi": 0.313
+        },
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-4B-Base",
+          "co_fail": 0.045,
+          "indep_baseline": 0.0293,
+          "lift": 1.535,
+          "phi": 0.113
+        },
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.045,
+          "indep_baseline": 0.0217,
+          "lift": 2.076,
+          "phi": 0.192
+        },
+        {
+          "i": "Qwen3.5-2B-Base",
+          "j": "Qwen3.5-4B-Base",
+          "co_fail": 0.065,
+          "indep_baseline": 0.0167,
+          "lift": 3.898,
+          "phi": 0.43
+        },
+        {
+          "i": "Qwen3.5-2B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.05,
+          "indep_baseline": 0.0123,
+          "lift": 4.057,
+          "phi": 0.384
+        },
+        {
+          "i": "Qwen3.5-4B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.075,
+          "indep_baseline": 0.0098,
+          "lift": 7.673,
+          "phi": 0.733
+        }
+      ],
+      "pattern": {
+        "pattern_dist": {
+          "0000": 0.64,
+          "0001": 0.005,
+          "0010": 0.02,
+          "0011": 0.02,
+          "0100": 0.03,
+          "0101": 0.0,
+          "0110": 0.015,
+          "0111": 0.015,
+          "1000": 0.16,
+          "1001": 0.0,
+          "1010": 0.0,
+          "1011": 0.01,
+          "1100": 0.045,
+          "1101": 0.005,
+          "1110": 0.005,
+          "1111": 0.03
+        },
+        "pattern_counts": {
+          "0000": 128,
+          "0001": 1,
+          "0010": 4,
+          "0011": 4,
+          "0100": 6,
+          "0101": 0,
+          "0110": 3,
+          "0111": 3,
+          "1000": 32,
+          "1001": 0,
+          "1010": 0,
+          "1011": 2,
+          "1100": 9,
+          "1101": 1,
+          "1110": 1,
+          "1111": 6
+        },
+        "monotone_patterns": [
+          "0000",
+          "1000",
+          "1100",
+          "1110",
+          "1111"
+        ],
+        "monotone_mass": 0.88,
+        "nonmonotone_mass": 0.12,
+        "emergent_1110_count": 1,
+        "frontier_1111_count": 6,
+        "trivial_0000_count": 128
+      },
+      "kl_to_independence": 0.2926
+    },
+    "gsm8k": {
+      "label": "DOMAIN: gsm8k",
+      "n_prompts": 200,
+      "fail_rates": {
+        "Qwen3.5-0.8B-Base": 0.975,
+        "Qwen3.5-2B-Base": 0.985,
+        "Qwen3.5-4B-Base": 0.975,
+        "Qwen3.5-9B-Base": 0.965
+      },
+      "pairwise": [
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-2B-Base",
+          "co_fail": 0.96,
+          "indep_baseline": 0.9604,
+          "lift": 1.0,
+          "phi": -0.02
+        },
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-4B-Base",
+          "co_fail": 0.95,
+          "indep_baseline": 0.9506,
+          "lift": 0.999,
+          "phi": -0.026
+        },
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.94,
+          "indep_baseline": 0.9409,
+          "lift": 0.999,
+          "phi": -0.03
+        },
+        {
+          "i": "Qwen3.5-2B-Base",
+          "j": "Qwen3.5-4B-Base",
+          "co_fail": 0.96,
+          "indep_baseline": 0.9604,
+          "lift": 1.0,
+          "phi": -0.02
+        },
+        {
+          "i": "Qwen3.5-2B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.95,
+          "indep_baseline": 0.9505,
+          "lift": 0.999,
+          "phi": -0.024
+        },
+        {
+          "i": "Qwen3.5-4B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.94,
+          "indep_baseline": 0.9409,
+          "lift": 0.999,
+          "phi": -0.03
+        }
+      ],
+      "pattern": {
+        "pattern_dist": {
+          "0000": 0.0,
+          "0001": 0.0,
+          "0010": 0.0,
+          "0011": 0.0,
+          "0100": 0.0,
+          "0101": 0.0,
+          "0110": 0.0,
+          "0111": 0.025,
+          "1000": 0.0,
+          "1001": 0.0,
+          "1010": 0.0,
+          "1011": 0.015,
+          "1100": 0.0,
+          "1101": 0.025,
+          "1110": 0.035,
+          "1111": 0.9
+        },
+        "pattern_counts": {
+          "0000": 0,
+          "0001": 0,
+          "0010": 0,
+          "0011": 0,
+          "0100": 0,
+          "0101": 0,
+          "0110": 0,
+          "0111": 5,
+          "1000": 0,
+          "1001": 0,
+          "1010": 0,
+          "1011": 3,
+          "1100": 0,
+          "1101": 5,
+          "1110": 7,
+          "1111": 180
+        },
+        "monotone_patterns": [
+          "0000",
+          "1000",
+          "1100",
+          "1110",
+          "1111"
+        ],
+        "monotone_mass": 0.935,
+        "nonmonotone_mass": 0.065,
+        "emergent_1110_count": 7,
+        "frontier_1111_count": 180,
+        "trivial_0000_count": 0
+      },
+      "kl_to_independence": 0.0038
+    },
+    "humaneval": {
+      "label": "DOMAIN: humaneval",
+      "n_prompts": 164,
+      "fail_rates": {
+        "Qwen3.5-0.8B-Base": 0.9329,
+        "Qwen3.5-2B-Base": 0.8841,
+        "Qwen3.5-4B-Base": 0.6402,
+        "Qwen3.5-9B-Base": 0.4939
+      },
+      "pairwise": [
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-2B-Base",
+          "co_fail": 0.8476,
+          "indep_baseline": 0.8248,
+          "lift": 1.028,
+          "phi": 0.284
+        },
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-4B-Base",
+          "co_fail": 0.6037,
+          "indep_baseline": 0.5973,
+          "lift": 1.011,
+          "phi": 0.053
+        },
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.4817,
+          "indep_baseline": 0.4608,
+          "lift": 1.045,
+          "phi": 0.167
+        },
+        {
+          "i": "Qwen3.5-2B-Base",
+          "j": "Qwen3.5-4B-Base",
+          "co_fail": 0.622,
+          "indep_baseline": 0.5661,
+          "lift": 1.099,
+          "phi": 0.364
+        },
+        {
+          "i": "Qwen3.5-2B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.4695,
+          "indep_baseline": 0.4367,
+          "lift": 1.075,
+          "phi": 0.205
+        },
+        {
+          "i": "Qwen3.5-4B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.3902,
+          "indep_baseline": 0.3162,
+          "lift": 1.234,
+          "phi": 0.309
+        }
+      ],
+      "pattern": {
+        "pattern_dist": {
+          "0000": 0.0122,
+          "0001": 0.0061,
+          "0010": 0.0122,
+          "0011": 0.0,
+          "0100": 0.0122,
+          "0101": 0.0,
+          "0110": 0.0183,
+          "0111": 0.0061,
+          "1000": 0.0671,
+          "1001": 0.0122,
+          "1010": 0.0,
+          "1011": 0.0061,
+          "1100": 0.1646,
+          "1101": 0.0854,
+          "1110": 0.2195,
+          "1111": 0.378
+        },
+        "pattern_counts": {
+          "0000": 2,
+          "0001": 1,
+          "0010": 2,
+          "0011": 0,
+          "0100": 2,
+          "0101": 0,
+          "0110": 3,
+          "0111": 1,
+          "1000": 11,
+          "1001": 2,
+          "1010": 0,
+          "1011": 1,
+          "1100": 27,
+          "1101": 14,
+          "1110": 36,
+          "1111": 62
+        },
+        "monotone_patterns": [
+          "0000",
+          "1000",
+          "1100",
+          "1110",
+          "1111"
+        ],
+        "monotone_mass": 0.8414,
+        "nonmonotone_mass": 0.1586,
+        "emergent_1110_count": 36,
+        "frontier_1111_count": 62,
+        "trivial_0000_count": 2
+      },
+      "kl_to_independence": 0.1806
+    },
+    "mbpp": {
+      "label": "DOMAIN: mbpp",
+      "n_prompts": 200,
+      "fail_rates": {
+        "Qwen3.5-0.8B-Base": 0.585,
+        "Qwen3.5-2B-Base": 0.535,
+        "Qwen3.5-4B-Base": 0.39,
+        "Qwen3.5-9B-Base": 0.25
+      },
+      "pairwise": [
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-2B-Base",
+          "co_fail": 0.465,
+          "indep_baseline": 0.313,
+          "lift": 1.486,
+          "phi": 0.619
+        },
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-4B-Base",
+          "co_fail": 0.345,
+          "indep_baseline": 0.2281,
+          "lift": 1.512,
+          "phi": 0.486
+        },
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.22,
+          "indep_baseline": 0.1462,
+          "lift": 1.504,
+          "phi": 0.346
+        },
+        {
+          "i": "Qwen3.5-2B-Base",
+          "j": "Qwen3.5-4B-Base",
+          "co_fail": 0.35,
+          "indep_baseline": 0.2087,
+          "lift": 1.677,
+          "phi": 0.581
+        },
+        {
+          "i": "Qwen3.5-2B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.235,
+          "indep_baseline": 0.1338,
+          "lift": 1.757,
+          "phi": 0.469
+        },
+        {
+          "i": "Qwen3.5-4B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.22,
+          "indep_baseline": 0.0975,
+          "lift": 2.256,
+          "phi": 0.58
+        }
+      ],
+      "pattern": {
+        "pattern_dist": {
+          "0000": 0.335,
+          "0001": 0.0,
+          "0010": 0.005,
+          "0011": 0.005,
+          "0100": 0.025,
+          "0101": 0.01,
+          "0110": 0.02,
+          "0111": 0.015,
+          "1000": 0.085,
+          "1001": 0.005,
+          "1010": 0.025,
+          "1011": 0.005,
+          "1100": 0.135,
+          "1101": 0.015,
+          "1110": 0.12,
+          "1111": 0.195
+        },
+        "pattern_counts": {
+          "0000": 67,
+          "0001": 0,
+          "0010": 1,
+          "0011": 1,
+          "0100": 5,
+          "0101": 2,
+          "0110": 4,
+          "0111": 3,
+          "1000": 17,
+          "1001": 1,
+          "1010": 5,
+          "1011": 1,
+          "1100": 27,
+          "1101": 3,
+          "1110": 24,
+          "1111": 39
+        },
+        "monotone_patterns": [
+          "0000",
+          "1000",
+          "1100",
+          "1110",
+          "1111"
+        ],
+        "monotone_mass": 0.87,
+        "nonmonotone_mass": 0.13,
+        "emergent_1110_count": 24,
+        "frontier_1111_count": 39,
+        "trivial_0000_count": 67
+      },
+      "kl_to_independence": 0.6403
+    },
+    "mmlu": {
+      "label": "DOMAIN: mmlu",
+      "n_prompts": 200,
+      "fail_rates": {
+        "Qwen3.5-0.8B-Base": 0.47,
+        "Qwen3.5-2B-Base": 0.385,
+        "Qwen3.5-4B-Base": 0.305,
+        "Qwen3.5-9B-Base": 0.235
+      },
+      "pairwise": [
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-2B-Base",
+          "co_fail": 0.28,
+          "indep_baseline": 0.1809,
+          "lift": 1.547,
+          "phi": 0.408
+        },
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-4B-Base",
+          "co_fail": 0.23,
+          "indep_baseline": 0.1433,
+          "lift": 1.604,
+          "phi": 0.377
+        },
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.17,
+          "indep_baseline": 0.1104,
+          "lift": 1.539,
+          "phi": 0.281
+        },
+        {
+          "i": "Qwen3.5-2B-Base",
+          "j": "Qwen3.5-4B-Base",
+          "co_fail": 0.22,
+          "indep_baseline": 0.1174,
+          "lift": 1.874,
+          "phi": 0.458
+        },
+        {
+          "i": "Qwen3.5-2B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.155,
+          "indep_baseline": 0.0905,
+          "lift": 1.713,
+          "phi": 0.313
+        },
+        {
+          "i": "Qwen3.5-4B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.195,
+          "indep_baseline": 0.0717,
+          "lift": 2.721,
+          "phi": 0.632
+        }
+      ],
+      "pattern": {
+        "pattern_dist": {
+          "0000": 0.38,
+          "0001": 0.01,
+          "0010": 0.01,
+          "0011": 0.025,
+          "0100": 0.055,
+          "0101": 0.01,
+          "0110": 0.02,
+          "0111": 0.02,
+          "1000": 0.13,
+          "1001": 0.01,
+          "1010": 0.015,
+          "1011": 0.035,
+          "1100": 0.09,
+          "1101": 0.01,
+          "1110": 0.065,
+          "1111": 0.115
+        },
+        "pattern_counts": {
+          "0000": 76,
+          "0001": 2,
+          "0010": 2,
+          "0011": 5,
+          "0100": 11,
+          "0101": 2,
+          "0110": 4,
+          "0111": 4,
+          "1000": 26,
+          "1001": 2,
+          "1010": 3,
+          "1011": 7,
+          "1100": 18,
+          "1101": 2,
+          "1110": 13,
+          "1111": 23
+        },
+        "monotone_patterns": [
+          "0000",
+          "1000",
+          "1100",
+          "1110",
+          "1111"
+        ],
+        "monotone_mass": 0.78,
+        "nonmonotone_mass": 0.22,
+        "emergent_1110_count": 13,
+        "frontier_1111_count": 23,
+        "trivial_0000_count": 76
+      },
+      "kl_to_independence": 0.4233
+    },
+    "truthfulqa": {
+      "label": "DOMAIN: truthfulqa",
+      "n_prompts": 200,
+      "fail_rates": {
+        "Qwen3.5-0.8B-Base": 0.655,
+        "Qwen3.5-2B-Base": 0.52,
+        "Qwen3.5-4B-Base": 0.44,
+        "Qwen3.5-9B-Base": 0.37
+      },
+      "pairwise": [
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-2B-Base",
+          "co_fail": 0.465,
+          "indep_baseline": 0.3406,
+          "lift": 1.365,
+          "phi": 0.524
+        },
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-4B-Base",
+          "co_fail": 0.39,
+          "indep_baseline": 0.2882,
+          "lift": 1.353,
+          "phi": 0.431
+        },
+        {
+          "i": "Qwen3.5-0.8B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.32,
+          "indep_baseline": 0.2424,
+          "lift": 1.32,
+          "phi": 0.338
+        },
+        {
+          "i": "Qwen3.5-2B-Base",
+          "j": "Qwen3.5-4B-Base",
+          "co_fail": 0.355,
+          "indep_baseline": 0.2288,
+          "lift": 1.552,
+          "phi": 0.509
+        },
+        {
+          "i": "Qwen3.5-2B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.3,
+          "indep_baseline": 0.1924,
+          "lift": 1.559,
+          "phi": 0.446
+        },
+        {
+          "i": "Qwen3.5-4B-Base",
+          "j": "Qwen3.5-9B-Base",
+          "co_fail": 0.345,
+          "indep_baseline": 0.1628,
+          "lift": 2.119,
+          "phi": 0.76
+        }
+      ],
+      "pattern": {
+        "pattern_dist": {
+          "0000": 0.25,
+          "0001": 0.01,
+          "0010": 0.015,
+          "0011": 0.015,
+          "0100": 0.03,
+          "0101": 0.005,
+          "0110": 0.0,
+          "0111": 0.02,
+          "1000": 0.13,
+          "1001": 0.005,
+          "1010": 0.015,
+          "1011": 0.04,
+          "1100": 0.125,
+          "1101": 0.005,
+          "1110": 0.065,
+          "1111": 0.27
+        },
+        "pattern_counts": {
+          "0000": 50,
+          "0001": 2,
+          "0010": 3,
+          "0011": 3,
+          "0100": 6,
+          "0101": 1,
+          "0110": 0,
+          "0111": 4,
+          "1000": 26,
+          "1001": 1,
+          "1010": 3,
+          "1011": 8,
+          "1100": 25,
+          "1101": 1,
+          "1110": 13,
+          "1111": 54
+        },
+        "monotone_patterns": [
+          "0000",
+          "1000",
+          "1100",
+          "1110",
+          "1111"
+        ],
+        "monotone_mass": 0.84,
+        "nonmonotone_mass": 0.16,
+        "emergent_1110_count": 13,
+        "frontier_1111_count": 54,
+        "trivial_0000_count": 50
+      },
+      "kl_to_independence": 0.6519
+    }
+  }
+}
