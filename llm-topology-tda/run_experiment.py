@@ -70,8 +70,18 @@ from analyze import (  # noqa: E402
     stage_persistence,
     stage_umap,
 )
-from datasets_lib import grade_sample, load_samples  # noqa: E402
-from pipeline import extract_hidden_states, generate_completions, load_model  # noqa: E402
+from datasets_lib import (  # noqa: E402
+    LIKELIHOOD_DATASETS,
+    grade_sample,
+    load_samples,
+)
+from pipeline import (  # noqa: E402
+    extract_hidden_states,
+    generate_completions,
+    grade_mc_likelihood,
+    grade_yesno_likelihood,
+    load_model,
+)
 
 
 DEFAULT_DATASETS: list[tuple[str, int]] = [
@@ -104,6 +114,11 @@ def parse_args():
                    help="Generate completions and grade; enables Stage 7 differential persistence")
     p.add_argument("--max-new-tokens", type=int, default=256,
                    help="Generation length when --grade is set (default: 256)")
+    p.add_argument("--batch-size", type=int, default=8,
+                   help="Generation batch size (default: 8). Drop to 4 if "
+                        "you OOM on 9B with long prompts; raise to 16 for "
+                        "smaller models. Likelihood scoring is single-prompt "
+                        "regardless and ignores this flag.")
     p.add_argument("--pca-dim-for-tda", type=int, default=30,
                    help="Project to this many PCA dims before Ripser (default: 30)")
     p.add_argument("--maxdim", type=int, default=2,
@@ -176,24 +191,79 @@ def main():
         problem_ids=np.array([s.problem_id for s in samples]),
     )
 
-    # ── Stage 3 (optional): generate + grade ─────────────────────────
+    # ── Stage 3 (optional): generate / score + grade ─────────────────
+    # MC tasks (mmlu/truthfulqa/arc_challenge/boolq) are graded via
+    # likelihood scoring: next-token log-prob on each candidate letter
+    # (or "yes"/"no" for boolq). Generative tasks (humaneval/mbpp/gsm8k)
+    # use the legacy generation + regex/exec path. The order of records
+    # in `graded.json` is preserved to match `samples` so downstream
+    # alignment with hidden states is stable.
     correct_mask = None
     if args.grade:
-        print("\n=== Stage 3: Generate completions ===")
-        completions = generate_completions(
-            model, tok, prompts, max_new_tokens=args.max_new_tokens
-        )
+        graded_by_idx: dict[int, dict] = {}
 
-        print("\n=== Stage 4: Grade ===")
-        graded_records = []
-        for s, c in zip(samples, completions):
-            ok = grade_sample(s, c)
-            graded_records.append({
-                "problem_id": s.problem_id,
-                "dataset": s.dataset,
-                "completion": c,
-                "correct": bool(ok),
-            })
+        # Partition by grading method
+        mc_idx = [i for i, s in enumerate(samples)
+                  if s.dataset in LIKELIHOOD_DATASETS]
+        gen_idx = [i for i, s in enumerate(samples)
+                   if s.dataset not in LIKELIHOOD_DATASETS]
+
+        # ── Stage 3a: Likelihood-MC scoring ──────────────────────────
+        if mc_idx:
+            print(f"\n=== Stage 3a: Likelihood scoring ({len(mc_idx)} MC prompts) ===")
+            from tqdm import tqdm
+            for i in tqdm(mc_idx, desc="ll-score"):
+                s = samples[i]
+                if s.dataset == "boolq":
+                    ok, scores, pred = grade_yesno_likelihood(
+                        model, tok, s.prompt, s.answer)
+                    graded_by_idx[i] = {
+                        "problem_id": s.problem_id,
+                        "dataset": s.dataset,
+                        "scores": scores,
+                        "pred": pred,
+                        "gold": s.answer,
+                        "correct": bool(ok),
+                        "method": "likelihood_yesno",
+                    }
+                else:
+                    candidates = s.metadata["candidates"]
+                    ok, scores, pred = grade_mc_likelihood(
+                        model, tok, s.prompt, candidates, s.answer)
+                    graded_by_idx[i] = {
+                        "problem_id": s.problem_id,
+                        "dataset": s.dataset,
+                        "scores": scores,                    # per-letter log-prob
+                        "candidates": candidates,
+                        "pred": pred,
+                        "gold": s.answer,
+                        "correct": bool(ok),
+                        "method": "likelihood_letter",
+                    }
+
+        # ── Stage 3b: Generation for free-form tasks ─────────────────
+        if gen_idx:
+            print(f"\n=== Stage 3b: Generate completions ({len(gen_idx)} prompts, batch_size={args.batch_size}) ===")
+            gen_prompts = [samples[i].prompt for i in gen_idx]
+            completions = generate_completions(
+                model, tok, gen_prompts,
+                max_new_tokens=args.max_new_tokens,
+                batch_size=args.batch_size,
+            )
+            print("\n=== Stage 4: Grade generative tasks ===")
+            for i, c in zip(gen_idx, completions):
+                s = samples[i]
+                ok = grade_sample(s, c)
+                graded_by_idx[i] = {
+                    "problem_id": s.problem_id,
+                    "dataset": s.dataset,
+                    "completion": c,
+                    "correct": bool(ok),
+                    "method": "generation",
+                }
+
+        # Reassemble in original sample order
+        graded_records = [graded_by_idx[i] for i in range(len(samples))]
         with open(os.path.join(args.output, "graded.json"), "w") as f:
             json.dump(graded_records, f, indent=2)
 
@@ -201,7 +271,9 @@ def main():
         for ds in sorted(counts):
             recs = [r for r in graded_records if r["dataset"] == ds]
             n_correct = sum(1 for r in recs if r["correct"])
-            print(f"  {ds:>12s}: {n_correct:>3d}/{len(recs):<3d} = {n_correct/len(recs):.1%}")
+            method = recs[0]["method"] if recs else "-"
+            print(f"  {ds:>12s} ({method:>18s}): "
+                  f"{n_correct:>3d}/{len(recs):<3d} = {n_correct/len(recs):.1%}")
 
         correct_mask = np.array([r["correct"] for r in graded_records])
 

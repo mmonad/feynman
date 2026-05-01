@@ -58,6 +58,22 @@ NSWEEP_PER_DATASET = [100, 400, 800]
 # 0.8B can be reused; only 2B/4B/9B need new runs.
 BIGGER_N_PER_DATASET = 200
 
+# Phase H: proper-grading run for failure topology. All 7 datasets at
+# N=200/ds, graded with likelihood scoring on MC tasks (mmlu, truthfulqa,
+# arc_challenge, boolq) and generation+exec/regex on the rest (humaneval,
+# mbpp, gsm8k). Replaces Phase A's generation-and-parse approach which is
+# unreliable for base models on multiple-choice. max_new_tokens raised to
+# 512 to give 8-shot CoT GSM8K room to reach a final answer.
+PHASE_H_DATASETS = [
+    ("humaneval",     200),
+    ("mbpp",          200),
+    ("gsm8k",         200),
+    ("mmlu",          200),
+    ("truthfulqa",    200),
+    ("arc_challenge", 200),
+    ("boolq",         200),
+]
+
 # Default GPU pool. Override via --gpus.
 DEFAULT_GPUS = (1, 3)
 
@@ -199,6 +215,27 @@ def build_default_campaign() -> list[dict]:
             "datasets": [(ds, BIGGER_N_PER_DATASET) for ds, _ in base_datasets],
         })
 
+    # Phase H: proper-grading run with likelihood-MC + 8-shot CoT GSM8K
+    # + batched generation. All 4 models × 7 datasets × N=200 = 5600
+    # prompts × per-prompt likelihood / generation grading. Used by
+    # failure_topology.py for the clean error tensor.
+    #
+    # Batch size: 8 fits 9B at ~25 GB on 32 GB R9700 with 1800-token
+    # sequences (8-shot CoT GSM8K is the longest prompt class). Drop to
+    # 4 if 9B OOMs; raise to 16 for the smaller models if we want to
+    # squeeze more throughput.
+    for m in models:
+        bs = 8 if "9B" in m else 16
+        plan.append({
+            "tag":            "phaseH-proper-grading-N200",
+            "model":          m,
+            "layer":          canonical_layer(m),
+            "grade":          True,
+            "datasets":       PHASE_H_DATASETS,
+            "max_new_tokens": 512,
+            "batch_size":     bs,
+        })
+
     return plan
 
 
@@ -245,6 +282,8 @@ def run_one(cfg: dict, gpu: int, output_root: Path, log_lock: threading.Lock,
         cmd.append("--grade")
     if cfg.get("max_new_tokens"):
         cmd.extend(["--max-new-tokens", str(cfg["max_new_tokens"])])
+    if cfg.get("batch_size"):
+        cmd.extend(["--batch-size", str(cfg["batch_size"])])
 
     env = os.environ.copy()
     env["HF_ENDPOINT"] = "https://huggingface.co"  # bypass broken local mirror
