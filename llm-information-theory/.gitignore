@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.ruff_cache/
+.pytest_cache/
+
+# scoring outputs
+results/
+*.jsonl
+
+# HF caches sometimes get symlinked into the project root
+hf_cache/
