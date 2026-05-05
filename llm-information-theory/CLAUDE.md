@@ -2,12 +2,20 @@
 
 ## Goal
 
-Estimate `H_hat = -(1/N) sum_t log2 q_theta(x_t | x_{t-K}..x_{t-1})`
-(bits/token) for the Qwen3.5 family on a held-out FineWeb 10BT subset,
-using **strict-K rolling-window scoring** — every scored token has
-*exactly* K tokens of left context. Cross-entropy is an upper bound on
-the true entropy rate; bigger / better models tighten the bound, and
-larger K tightens it further.
+Estimate
+
+    H_hat(q_theta) = -(1/N) * sum_t log2 q_theta(x_t | x_0, ..., x_{t-1})
+
+(bits/token) for the Qwen3.5 family on a held-out FineWeb 10BT subset
+using **expanding-context scoring**: one forward pass per document on
+`[x_0, ..., x_{T-1}]`, then post-process by selecting logit rows
+`[K-1, T-2]` so every scored token has at least `K` tokens of left
+context. Cross-entropy is an upper bound on the true entropy rate
+(`H(P, Q) = H(P) + KL(P || Q)`); bigger / better models tighten the
+bound, and longer per-doc context (`max_doc_length`) tightens it
+further by including more high-context tokens. `K` mainly sets a floor
+on the per-token context — it discards low-context early tokens from
+the aggregate but doesn't change what the surviving tokens see.
 
 ## Hardware & toolchain
 
@@ -31,34 +39,40 @@ larger K tightens it further.
 - For multimodal Qwen3.5 wrappers, drill into `model.model` /
   `model.language_model` to get a text-only forward (mirror
   `find_extraction_target` in the TDA pipeline).
-- Default `K = 2048`. Per-token forward-pass input length is `K` (NOT
-  `2K`). The user can override; document the trade-off (larger `K`
-  tightens the upper bound but the forward pass scales linearly).
-- Strict-K is ~K/2 times more expensive than a block scorer per scored
-  token. Mitigate with `--batch-size`: rows of the `(B, K)` batched
-  input are 1-token shifts of each other, so the GPU runs them in
-  parallel.
+- Default `K = 2048`, default `--max-doc-length = 16384`. The forward
+  pass length is `min(T, max_doc_length, model.max_position_embeddings)`.
+- One forward pass per document. The expanding-context predictions
+  for *every* `K' >= K` are produced as a side effect of causal
+  attention — re-aggregating at a different K does not require a new
+  forward pass. Multi-doc batching via right-padding + attention mask
+  is supported through `--batch-docs N`, but stream-order batching
+  (no length bucketing) means a long doc forces all others to pad to
+  its length. Default `--batch-docs 1`.
 
-## Critical correctness invariants — `windowed_eval.score_document_rolling`
+## Critical correctness invariants — `windowed_eval.score_document_expanding`
 
-1. The first `K` tokens of every document are warmup context and are
-   never scored.
-2. For each scored target `x_t` (t in [K, T-1]):
-     - input window = `[x_{t-K}, ..., x_{t-1}]` (length `K`)
-     - logits[K-1] from that forward pass predicts `x_t` given exactly
-       those K context tokens.
-3. K-length windows are batched: row `j` of a `(B, K)` batched input
-   tensor is the input window for the `j`-th scored target in that
-   batch, i.e. each row is a 1-token shift of the previous row.
-   `test_inputs_are_one_token_shifts` exercises this directly.
-4. Direct logits + `cross_entropy(reduction='sum')` (NOT the
-   `labels=-100` shortcut). Auditable indexing.
-5. Loss is in **nats** out of `cross_entropy`; convert with `1/ln(2)`.
-6. Documents with `T <= K` produce `scored_tokens=0` and are skipped
-   before the forward pass.
+1. Causal-LM contract: a forward pass on `[x_0, ..., x_{T-1}]` yields
+   logits `(1, T, V)` where `logits[k]` reads out
+   `P(next | x_0..x_k)`.
+2. Score targets `[x_K, ..., x_{T-1}]` against logit rows `[K-1, T-2]`.
+   Target `x_t` (at 0-based position `t`) is scored against logit row
+   `t-1`, which conditions on tokens `[x_0, ..., x_{t-1}]` — i.e. `t`
+   left tokens. So the scored set has context lengths in `[K, T-1]`
+   (always >= K).
+3. The first `K` tokens are warmup context and are never scored.
+4. Documents with `T_used <= K` (where `T_used = min(T, max_length)`)
+   contribute `scored_tokens = 0` and are skipped before the forward
+   pass.
+5. Direct logits + `cross_entropy(reduction='sum')`. Loss is in
+   **nats**; convert with `1/ln(2)`.
+6. Cross-entropy is **chunked** (`_sum_nll_chunked`, default chunk
+   1024 rows): a `(N, V)` bf16 slice cast to fp32 in one shot would
+   transiently allocate `N * V * 6 bytes` (bf16 + fp32 copies coexist).
+   Chunking caps the fp32 footprint at `chunk * V * 4 bytes`.
 
-If you change any of those invariants, also update
-`test_windowed_eval.py` and the README.
+`test_windowed_eval.py` exercises count invariants, uniform-logit NLL,
+batched-vs-single equivalence, and attention-mask placement. If you
+change any of those invariants, update the tests and the README.
 
 ## Critical correctness invariants — byte counting (`run.py`)
 
@@ -68,7 +82,29 @@ If you change any of those invariants, also update
 - Instead: use the fast tokenizer's `offset_mapping` (codepoint indices
   into the original text), then slice and re-encode. The codepoint
   boundary is always valid UTF-8.
-- `bytes_scored = len(text[offsets[K][0] : offsets[T-1][1]].encode('utf-8'))`.
+- `bytes_scored = len(text[offsets[K][0] : offsets[forward_length-1][1]].encode('utf-8'))`.
+
+## Data path
+
+The default data source is **`datasets.load_dataset(streaming=False)`**
+over the local hub cache. Pre-download FineWeb sample-10BT once via:
+
+    hf download HuggingFaceFW/fineweb --repo-type dataset \
+        --include "sample/10BT/*.parquet"
+
+This populates `~/.cache/huggingface/hub/datasets--HuggingFaceFW--fineweb/`.
+First load builds a memory-mapped Arrow cache from the parquet shards
+(~100 s for 14.9M docs); subsequent loads are instant.
+
+`--streaming` opts into `load_dataset(streaming=True)` (network); use
+only for ad-hoc inspection — the HF CDN drops connections during long
+runs. `--local-parquet` is a pyarrow-direct fallback retained only in
+case datasets-API config resolution breaks on a future release.
+
+Hash holdout: `HoldoutConfig(mod=1000, keep=1)` keeps a doc when
+`blake2b(doc_id) % 1000 < 1` (~0.1% of docs, ~14.9k docs from
+sample-10BT). Same doc set on any machine without materializing a
+split file.
 
 ## Output schema (JSONL)
 
@@ -77,9 +113,10 @@ If you change any of those invariants, also update
 - Floats are JSON numbers. Unavailable quantities are `null`, never
   `NaN` (not valid JSON; `json.dumps(float('nan'))` produces `NaN`
   unless you intercept it).
-- The footer's `bits_per_token` and `bits_per_byte` are the
-  authoritative aggregates; `report.py` re-aggregates from doc lines
-  as a check.
+- Per-doc lines include `forward_length` (post-cap) alongside `tokens`
+  and `scored_tokens`.
+- Footer aggregates use `null` (not NaN/inf) for unavailable
+  quantities. `report.py` re-aggregates from doc lines as a check.
 
 ## Things to avoid
 
@@ -88,12 +125,14 @@ If you change any of those invariants, also update
 - Don't compare bits/token across tokenizers. Always cross-reference
   bits/byte.
 - Don't use `model.generate()`. We score, we don't sample.
-- Don't use `padding=True` for scoring. Pad tokens contaminate causal
-  contexts even with attention masks if the implementation is not
-  careful. Score one document at a time.
+- Don't `.float()`-upcast a full bf16 logits tensor in one shot — the
+  transient copy doubles peak memory. Use `_sum_nll_chunked`.
 - Don't mix FP16 and BF16 — pin bf16.
-- Don't restore the old sliding-window-with-stride protocol or the
-  block-mode rolling protocol; the user has explicitly chosen
-  strict-K rolling (one forward pass per scored token, K context).
+- Don't restore the old sliding-window-with-stride or strict-K rolling
+  protocols; the user has explicitly chosen expanding-context (one
+  forward pass per doc; K is a post-processing slice).
 - Don't drop the `is_fast` check on the tokenizer in `models.py`; the
   byte-counting in `run.py` requires `return_offsets_mapping=True`.
+- Don't reach for pyarrow directly when the datasets library API works.
+  Default to `datasets.load_dataset(streaming=False)` and pre-download
+  via `hf download`.

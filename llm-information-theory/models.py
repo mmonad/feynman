@@ -18,6 +18,7 @@ models across GPUs automatically.
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from typing import Callable
 
@@ -152,14 +153,47 @@ def load_qwen(model_id: str) -> LoadedModel:
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
+    # Optional: override accelerate's auto-detected per-GPU max memory.
+    # Set LLM_IT_MAX_MEMORY="27GiB" to cap each visible CUDA device at that
+    # amount. Useful when vLLM or another process has reserved address space
+    # on the GPU and accelerate's free-memory query underestimates what's
+    # actually usable. Note: even with "cpu" omitted from max_memory,
+    # accelerate may still spill to "cpu" or "disk" if the cap is too low —
+    # we sanity-check `model.hf_device_map` after load and bail loudly.
+    max_memory = None
+    mem_override = os.environ.get("LLM_IT_MAX_MEMORY")
+    if mem_override:
+        n = torch.cuda.device_count()
+        max_memory = {i: mem_override for i in range(n)}
+        print(f"  max_memory override: {max_memory}")
+
     # transformers 5.x renamed `torch_dtype` -> `dtype`; old kwarg still works
     # but emits a deprecation warning each call (modeling_utils.py:1518).
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
         dtype=torch.bfloat16,
         device_map="auto",
+        max_memory=max_memory,
     )
     model.eval()
+
+    # Detect silent CPU/disk offload — runtime would crawl. With
+    # LLM_IT_MAX_MEMORY set, the user explicitly wants GPU-only; warn loudly
+    # so the run isn't tied up for hours on misconfigured memory caps.
+    hf_device_map = getattr(model, "hf_device_map", None) or {}
+    offloaded = sorted({
+        str(d) for d in hf_device_map.values()
+        if str(d) in ("cpu", "disk")
+    })
+    if offloaded:
+        n_offloaded = sum(1 for d in hf_device_map.values() if str(d) in ("cpu", "disk"))
+        msg = (
+            f"WARNING: {n_offloaded}/{len(hf_device_map)} modules are on "
+            f"{offloaded} (not GPU). Forward passes will be very slow."
+        )
+        if mem_override:
+            msg += " LLM_IT_MAX_MEMORY may be set too low for the model size."
+        print(f"  {msg}")
 
     text_cfg = getattr(model.config, "text_config", model.config)
     max_pos = _resolve_max_positions(model, tokenizer)

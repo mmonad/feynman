@@ -71,20 +71,29 @@ uv sync
 uv run python -c "import torch; print(torch.cuda.is_available(), torch.cuda.device_count())"
 ```
 
-## Local FineWeb shard (recommended)
+## FineWeb 10BT data
 
-The HF Hub CDN can drop streaming connections mid-shard. Pre-download one
-`sample-10BT` parquet shard once, then iterate from disk:
+Pre-download once. The HF Hub CDN drops streaming connections mid-shard,
+so any run that needs to actually finish reads from the local hub cache:
 
-```python
-from huggingface_hub import hf_hub_download
-hf_hub_download(
-    repo_id="HuggingFaceFW/fineweb",
-    repo_type="dataset",
-    filename="sample/10BT/000_00000.parquet",
-)
-# prints the cached path
+```bash
+hf download HuggingFaceFW/fineweb --repo-type dataset \
+    --include "sample/10BT/*.parquet"
 ```
+
+That's 15 parquet shards (~25 GB total). Once cached,
+`datasets.load_dataset("HuggingFaceFW/fineweb", "sample-10BT", split="train",
+streaming=False)` memory-maps them as Arrow row groups — that's the
+default path in `run.py`.
+
+Three modes, in order of preference:
+
+1. `--streaming` not set (default) — `load_dataset(streaming=False)` over
+   the local hub cache. Reliable; requires the `hf download` above.
+2. `--streaming` — `load_dataset(streaming=True)` direct from the Hub.
+   Convenient (no pre-download) but flaky for long runs.
+3. `--local-parquet path` (repeatable) — pyarrow direct, bypassing the
+   datasets cache builder. Fallback only.
 
 ## Quickstart: smoke run
 
@@ -94,7 +103,6 @@ HIP_VISIBLE_DEVICES=1 uv run python run.py \
     --K 2048 \
     --max-doc-length 16384 \
     --max-scored-tokens 200000 \
-    --local-parquet ~/.cache/huggingface/hub/datasets--HuggingFaceFW--fineweb/snapshots/<snap>/sample/10BT/000_00000.parquet \
     --out results/qwen3_5-0_8b-smoke.jsonl
 ```
 

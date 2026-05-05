@@ -1,4 +1,4 @@
-"""FineWeb 10BT streaming + deterministic hash holdout.
+"""FineWeb 10BT iteration + deterministic hash holdout.
 
 We select held-out documents by hashing the document id with blake2b.
 Hash holdout has two nice properties:
@@ -10,19 +10,31 @@ Hash holdout has two nice properties:
 
 The default (mod=1000, keep=1) selects ~0.1% of documents.
 
-Two source paths
-----------------
-1. Hub streaming (`stream_holdout`): pulls FineWeb directly from
-   HuggingFaceFW/fineweb via `datasets.load_dataset(streaming=True)`.
-   Convenient but at the mercy of HF's CDN, which can drop connections
-   during long runs.
-2. Local parquet (`stream_holdout_local`): reads one or more local
-   parquet shards via pyarrow. Pre-download once with `hf_hub_download`,
-   iterate forever after. Use this for any run that needs to actually
-   finish.
+Source paths
+------------
+All paths apply the same hash holdout filter and yield `(doc_id, text)`
+tuples. Prefer `stream_holdout` (datasets library) — both modes go
+through the HF datasets API.
 
-Both paths apply the same hash holdout filter and yield
-`(doc_id, text)` tuples.
+1. `stream_holdout(streaming=False)` — DEFAULT. Reads the local hub
+   cache via `datasets.load_dataset(streaming=False)`. Requires shards
+   to be pre-downloaded:
+
+       hf download HuggingFaceFW/fineweb --repo-type dataset \\
+           --include "sample/10BT/*.parquet"
+
+   First load memory-maps each parquet file into Arrow row groups;
+   subsequent loads are instant. This is the reliable path for any run
+   that needs to actually finish.
+
+2. `stream_holdout(streaming=True)` — Pulls FineWeb directly from
+   HuggingFaceFW/fineweb. Convenient (no pre-download) but at the mercy
+   of HF's CDN, which drops connections during long runs.
+
+3. `stream_holdout_local` — Fallback that reads parquet shards via
+   pyarrow directly, bypassing the datasets cache builder. Kept as a
+   safety net in case a future datasets release breaks parquet config
+   resolution.
 """
 
 from __future__ import annotations
@@ -56,9 +68,25 @@ def stream_holdout(
     config: str = DEFAULT_CONFIG,
     holdout: HoldoutConfig = HoldoutConfig(),
     min_chars: int = 64,
+    streaming: bool = False,
 ) -> Iterator[tuple[str, str]]:
-    """Stream held-out documents from the HF Hub (network-dependent)."""
-    ds = load_dataset(DATASET_ID, name=config, split="train", streaming=True)
+    """Yield held-out FineWeb documents via the HF datasets library.
+
+    streaming=False (default): `load_dataset(streaming=False)` reads
+    parquet shards from the local hub cache (memory-mapped Arrow row
+    groups). Requires pre-downloaded shards (see module docstring).
+
+    Caveat: `streaming=False` is *cache-preferring*, not strictly offline.
+    If the dataset has been updated on the Hub since `hf download`, the
+    library may resolve a newer snapshot and trigger a partial download.
+    Pin to the cached revision via `revision=...` or set
+    `HF_HUB_OFFLINE=1` if strict reproducibility is required.
+
+    streaming=True: `load_dataset(streaming=True)` fetches docs from the
+    Hub on demand. Network-dependent; HF's CDN can drop connections
+    during long runs.
+    """
+    ds = load_dataset(DATASET_ID, name=config, split="train", streaming=streaming)
     for ex in ds:
         doc_id = ex.get("id", "")
         text = ex.get("text", "")

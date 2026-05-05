@@ -7,8 +7,7 @@ __pycache__/
 .pytest_cache/
 
 # scoring outputs
-results/
-*.jsonl
+logs/
 
 # HF caches sometimes get symlinked into the project root
 hf_cache/

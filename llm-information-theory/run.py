@@ -7,13 +7,18 @@ JSONL per invocation. The header line records the run config; the
 footer line records the aggregate (bits/token, bits/byte, perplexity,
 95% CI).
 
+Default data source: `datasets.load_dataset(streaming=False)` reading
+the local hub cache. Pre-download once via:
+
+    hf download HuggingFaceFW/fineweb --repo-type dataset \\
+        --include "sample/10BT/*.parquet"
+
 Example:
-    uv run python run.py \
-        --model Qwen/Qwen3.5-0.8B-Base \
-        --K 2048 \
-        --max-doc-length 16384 \
-        --max-scored-tokens 200000 \
-        --local-parquet ~/.cache/.../sample/10BT/000_00000.parquet \
+    uv run python run.py \\
+        --model Qwen/Qwen3.5-0.8B-Base \\
+        --K 2048 \\
+        --max-doc-length 16384 \\
+        --max-scored-tokens 200000 \\
         --out results/qwen3_5-0_8b-smoke.jsonl
 """
 
@@ -50,9 +55,16 @@ def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
     p.add_argument("--model", required=True, help="HF model id, e.g. Qwen/Qwen3.5-0.8B-Base")
     p.add_argument("--config", default=DEFAULT_CONFIG, help="FineWeb config (default sample-10BT)")
+    p.add_argument("--streaming", action="store_true",
+                   help="Use datasets.load_dataset(streaming=True). Network-"
+                        "dependent; HF CDN can drop connections during long "
+                        "runs. Default is streaming=False, which reads the "
+                        "local hub cache (requires pre-downloaded shards).")
     p.add_argument("--local-parquet", action="append", default=None,
-                   help="Path(s) to local FineWeb parquet shards. If given, "
-                        "bypasses HF Hub streaming entirely. Repeat for multiple shards.")
+                   help="Fallback: read parquet shards via pyarrow directly, "
+                        "bypassing the datasets cache builder. Repeat for "
+                        "multiple shards. Only use this if datasets-API "
+                        "config resolution is broken on your version.")
     p.add_argument("--out", required=True, help="Output JSONL path")
     p.add_argument("--K", type=int, default=2048,
                    help="Minimum left-context length per scored token (default 2048). "
@@ -241,14 +253,16 @@ def main() -> None:
                 holdout=holdout,
                 min_chars=args.min_doc_chars,
             )
-            print(f"Source:      local parquet: {args.local_parquet}")
+            print(f"Source:      pyarrow fallback over {len(args.local_parquet)} shard(s)")
         else:
             doc_iter = stream_holdout(
                 config=args.config,
                 holdout=holdout,
                 min_chars=args.min_doc_chars,
+                streaming=args.streaming,
             )
-            print(f"Source:      HF Hub stream: {DATASET_ID}/{args.config}")
+            mode = "streaming=True (HF Hub network)" if args.streaming else "streaming=False (local hub cache)"
+            print(f"Source:      datasets.load_dataset {mode}")
 
         pbar = tqdm(total=args.max_scored_tokens, unit="tok", desc="scoring")
         # Each entry: (doc_id, text, ids, offsets)
