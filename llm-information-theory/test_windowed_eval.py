@@ -182,6 +182,60 @@ def test_batched_attention_mask() -> None:
     print(f"  ok: attention mask correctly placed (1s on real tokens, 0s on padding)")
 
 
+def test_per_token_nll_sum_matches_total() -> None:
+    """`nll_per_token` array must sum to `total_nll_nats` for any doc with
+    scored tokens, and re-aggregating at K_new > K_run by slicing the array
+    must give the same answer as scoring at K_new directly."""
+    device = torch.device("cpu")
+    ids = list(range(200))
+
+    # Score once at K=8, capture per-token array.
+    forward = UniformForward()
+    res_low = score_document_expanding(
+        ids=ids, forward_logits=forward, K=8, device=device,
+    )
+    assert res_low.nll_per_token is not None
+    assert res_low.nll_per_token.shape == (res_low.scored_tokens,)
+    assert math.isclose(
+        float(res_low.nll_per_token.sum()), res_low.total_nll_nats,
+        rel_tol=1e-5, abs_tol=1e-3,
+    )
+
+    # Score directly at K=64, compare to slicing the K=8 array.
+    K_new = 64
+    forward2 = UniformForward()
+    res_high = score_document_expanding(
+        ids=ids, forward_logits=forward2, K=K_new, device=device,
+    )
+    sliced = res_low.nll_per_token[K_new - 8:]
+    assert sliced.shape == (res_high.scored_tokens,)
+    assert math.isclose(
+        float(sliced.sum()), res_high.total_nll_nats,
+        rel_tol=1e-5, abs_tol=1e-3,
+    )
+    print(f"  ok: K=8 array slice at K_new=64 matches direct scoring at K=64")
+
+    # Same check on the batched scorer.
+    docs = [("a", list(range(50))), ("b", list(range(120)))]
+    fb = UniformForward()
+    bres_low = score_documents_expanding(
+        docs=docs, forward_logits=fb, K=8, device=device, pad_token_id=PAD_ID,
+    )
+    fb2 = UniformForward()
+    bres_high = score_documents_expanding(
+        docs=docs, forward_logits=fb2, K=32, device=device, pad_token_id=PAD_ID,
+    )
+    for (_, low), (_, high) in zip(bres_low, bres_high):
+        if low.scored_tokens == 0:
+            assert low.nll_per_token is None
+            continue
+        assert math.isclose(
+            float(low.nll_per_token[32 - 8:].sum()), high.total_nll_nats,
+            rel_tol=1e-5, abs_tol=1e-3,
+        )
+    print(f"  ok: batched K=8 array slice at K_new=32 matches direct scoring")
+
+
 def test_invalid_args_raise() -> None:
     device = torch.device("cpu")
     forward = UniformForward()
@@ -215,6 +269,8 @@ if __name__ == "__main__":
     test_batched_matches_single_doc()
     print("test_batched_attention_mask:")
     test_batched_attention_mask()
+    print("test_per_token_nll_sum_matches_total:")
+    test_per_token_nll_sum_matches_total()
     print("test_invalid_args_raise:")
     test_invalid_args_raise()
     print("\nAll tests passed.")

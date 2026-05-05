@@ -223,8 +223,20 @@ def main() -> None:
 
     signal.signal(signal.SIGINT, handle_sigint)
 
+    # Sidecar binary files for per-position data, opened alongside JSONL:
+    #   <out>.nll.bin   — float32 little-endian, per-position NLL in nats
+    #   <out>.bytes.bin — uint16 little-endian, per-position UTF-8 byte counts
+    # Concatenated across docs in append order. JSONL doc records carry a
+    # `nll_offset` (in float32 elements) so report.py can re-aggregate at
+    # any K_new >= header["K"] by slicing `nll_per_token[K_new - K_run:]`.
+    nll_bin_path = out_path.with_suffix(out_path.suffix + ".nll.bin")
+    bytes_bin_path = out_path.with_suffix(out_path.suffix + ".bytes.bin")
+
     t0 = time.monotonic()
-    with out_path.open("w") as fout:
+    with out_path.open("w") as fout, \
+         nll_bin_path.open("wb") as nll_bin, \
+         bytes_bin_path.open("wb") as bytes_bin:
+        sidecar_offset = 0   # in elements (matches the per-doc length)
         header = {
             "type": "header",
             "model": args.model,
@@ -243,6 +255,10 @@ def main() -> None:
             "num_hidden_layers": int(getattr(loaded.text_config, "num_hidden_layers", -1)),
             "max_position_embeddings": loaded.max_position_embeddings,
             "torch_dtype": str(next(loaded.model.parameters()).dtype),
+            "sidecar_nll_dtype": "float32",
+            "sidecar_bytes_dtype": "uint16",
+            "sidecar_nll_path": nll_bin_path.name,
+            "sidecar_bytes_path": bytes_bin_path.name,
         }
         fout.write(json.dumps(header) + "\n")
         fout.flush()
@@ -271,6 +287,7 @@ def main() -> None:
         def flush_batch():
             """Score and record everything in `pending`. Returns False if a stop
             condition (max-scored-tokens, max-docs) was hit during recording."""
+            nonlocal sidecar_offset
             if not pending:
                 return True
             score_inputs = [(d_id, ids) for (d_id, _t, ids, _o) in pending]
@@ -285,11 +302,45 @@ def main() -> None:
             for (d_id, text, ids, offsets), (_d_id_back, res) in zip(pending, results):
                 if res.scored_tokens == 0:
                     continue
-                # Scored absolute positions [K, forward_length - 1]; codepoint
-                # span [offsets[K].start, offsets[forward_length-1].end].
-                char_start = offsets[K][0]
-                char_end = offsets[res.forward_length - 1][1]
-                bytes_scored = len(text[char_start:char_end].encode("utf-8"))
+                # Per-position bytes via the fast tokenizer's offset_mapping.
+                # ByteLevel BPE can split a single codepoint across multiple
+                # tokens whose offsets overlap (both point at the same char
+                # span). Naive `len(utf8(text[s:e]))` would double-count the
+                # shared codepoint. Track `prev_end` so each token only
+                # contributes the bytes beyond what earlier tokens already
+                # claimed; sum of per-token bytes then equals the scored-span
+                # byte count exactly.
+                bytes_per_token = np.empty(res.scored_tokens, dtype="<u2")  # little-endian uint16
+                prev_end = offsets[K][0]
+                total_bytes = 0
+                for j in range(res.scored_tokens):
+                    s, e = offsets[K + j]
+                    effective_start = max(s, prev_end)
+                    if effective_start < e:
+                        b = len(text[effective_start:e].encode("utf-8"))
+                    else:
+                        b = 0   # this token was entirely covered by earlier ones
+                    if b > 65535:
+                        raise OverflowError(
+                            f"token bytes={b} exceeds uint16 at doc {d_id} "
+                            f"position {K + j}; widen sidecar_bytes_dtype"
+                        )
+                    bytes_per_token[j] = b
+                    total_bytes += b
+                    if e > prev_end:
+                        prev_end = e
+                bytes_scored = total_bytes
+
+                # Write per-position NLL (float32 LE) and bytes (uint16 LE)
+                # to sidecar binaries. nll_per_token comes off the GPU as fp32
+                # already; cast to little-endian view so files are portable
+                # across hosts of differing native byte order.
+                nll_arr = np.ascontiguousarray(
+                    res.nll_per_token.numpy(), dtype="<f4"
+                )
+                assert nll_arr.shape == (res.scored_tokens,)
+                nll_bin.write(nll_arr.tobytes())
+                bytes_bin.write(bytes_per_token.tobytes())
 
                 fout.write(json.dumps({
                     "type": "doc",
@@ -299,9 +350,13 @@ def main() -> None:
                     "scored_tokens": res.scored_tokens,
                     "nll_nats": res.total_nll_nats,
                     "bytes": bytes_scored,
+                    "nll_offset": sidecar_offset,
                 }) + "\n")
+                sidecar_offset += res.scored_tokens
                 if agg.docs_seen % 16 == 0:
                     fout.flush()
+                    nll_bin.flush()
+                    bytes_bin.flush()
                 agg.add(res.total_nll_nats, res.scored_tokens, res.tokens, bytes_scored)
                 pbar.update(res.scored_tokens)
 
@@ -354,6 +409,11 @@ def main() -> None:
         finally:
             pbar.close()
             elapsed = time.monotonic() - t0
+            # Flush sidecars BEFORE writing the footer so that, on a hard
+            # kill between footer-write and context-manager close, the
+            # JSONL never appears "complete" ahead of its sidecar bytes.
+            nll_bin.flush()
+            bytes_bin.flush()
             footer = {
                 "type": "footer",
                 "elapsed_seconds": elapsed,

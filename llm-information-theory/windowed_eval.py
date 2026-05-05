@@ -53,6 +53,10 @@ class DocResult:
     scored_tokens: int
     tokens: int
     forward_length: int   # actual T_used after capping at max_length
+    # Per-position NLL in nats, length = scored_tokens, on CPU as float32.
+    # Stored so K can be a report-time slice: aggregation at K_new >= K_run
+    # is `sum(nll_per_token[K_new - K_run:])`. None when no tokens scored.
+    nll_per_token: torch.Tensor | None = None
 
 
 # Default chunk size for cross-entropy. Per-chunk fp32 memory is
@@ -60,22 +64,22 @@ class DocResult:
 _DEFAULT_CE_CHUNK = 1024
 
 
-def _sum_nll_chunked(logits_2d, targets_1d, chunk_size: int = _DEFAULT_CE_CHUNK) -> float:
-    """Sum-reduced cross-entropy in fp32, computed in chunks.
+def _per_token_nll_chunked(logits_2d, targets_1d, chunk_size: int = _DEFAULT_CE_CHUNK) -> torch.Tensor:
+    """Per-position cross-entropy in nats, fp32, chunked. Returns (n,) on CPU.
 
-    Avoids the transient memory doubling that `.float()` causes when
-    upcasting a full bf16 logits tensor: a `(N, V)` bf16 tensor cast in
-    one shot costs `N * V * 6 bytes` transiently (the bf16 + fp32 copy
-    coexist). Chunking caps the fp32 footprint at `chunk_size * V * 4 bytes`.
+    Same chunked upcast pattern as the scalar variant — bounded fp32
+    footprint at `chunk_size * V * 4 bytes` instead of `N * V * 4` —
+    but reduction='none' so we get a per-position array. Sum the result
+    to recover the total NLL.
     """
-    total = 0.0
     n = logits_2d.size(0)
+    out = torch.empty(n, dtype=torch.float32)
     for start in range(0, n, chunk_size):
         end = min(start + chunk_size, n)
         chunk = logits_2d[start:end].float()
-        nll = F.cross_entropy(chunk, targets_1d[start:end], reduction="sum")
-        total += float(nll.item())
-    return total
+        nll = F.cross_entropy(chunk, targets_1d[start:end], reduction="none")
+        out[start:end] = nll.detach().to("cpu", non_blocking=False)
+    return out
 
 
 @torch.inference_mode()
@@ -96,7 +100,7 @@ def score_document_expanding(
     T = len(ids)
     T_used = min(T, max_length) if max_length is not None else T
     if T_used <= K:
-        return DocResult(0.0, 0, T, T_used)
+        return DocResult(0.0, 0, T, T_used, None)
 
     ids_t = torch.tensor(ids[:T_used], dtype=torch.long, device=device).unsqueeze(0)
     logits = forward_logits(ids_t, attention_mask=None)   # (1, T_used, V)
@@ -104,13 +108,15 @@ def score_document_expanding(
     # Post-processing: slice rows [K-1, T_used-2] -> targets [K, T_used-1].
     sel_logits = logits[0, K - 1:T_used - 1]               # (T_used - K, V) bf16
     sel_targets = ids_t[0, K:T_used]                       # (T_used - K,)
-    total_nats = _sum_nll_chunked(sel_logits, sel_targets)
+    nll_per_token = _per_token_nll_chunked(sel_logits, sel_targets)
+    total_nats = float(nll_per_token.sum().item())
 
     return DocResult(
         total_nll_nats=total_nats,
         scored_tokens=int(sel_targets.numel()),
         tokens=T,
         forward_length=T_used,
+        nll_per_token=nll_per_token,
     )
 
 
@@ -145,7 +151,7 @@ def score_documents_expanding(
     max_T = max(truncated_lengths)
     if max_T < 2:
         return [
-            (doc_id, DocResult(0.0, 0, len(ids), tl))
+            (doc_id, DocResult(0.0, 0, len(ids), tl, None))
             for (doc_id, ids), tl in zip(docs, truncated_lengths)
         ]
 
@@ -160,11 +166,12 @@ def score_documents_expanding(
     results: list[tuple[str, DocResult]] = []
     for i, ((doc_id, ids), tl) in enumerate(zip(docs, truncated_lengths)):
         if tl <= K:
-            results.append((doc_id, DocResult(0.0, 0, len(ids), tl)))
+            results.append((doc_id, DocResult(0.0, 0, len(ids), tl, None)))
             continue
         sel_logits = logits[i, K - 1:tl - 1]                # (tl - K, V) bf16
         sel_targets = input_ids[i, K:tl]                    # (tl - K,)
-        total_nats = _sum_nll_chunked(sel_logits, sel_targets)
+        nll_per_token = _per_token_nll_chunked(sel_logits, sel_targets)
+        total_nats = float(nll_per_token.sum().item())
         results.append((
             doc_id,
             DocResult(
@@ -172,6 +179,7 @@ def score_documents_expanding(
                 scored_tokens=int(sel_targets.numel()),
                 tokens=len(ids),
                 forward_length=tl,
+                nll_per_token=nll_per_token,
             ),
         ))
     return results
